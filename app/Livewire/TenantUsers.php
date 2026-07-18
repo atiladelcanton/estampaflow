@@ -46,7 +46,12 @@ final class TenantUsers extends Component
         $this->inviteUrl = $result->acceptUrl;
         $this->reset('email', 'role');
         $this->role = TenantRole::USER->value;
-        session()->flash('success', 'Convite criado. Em ambiente local, o e-mail também foi gravado no log.');
+        session()->flash(
+            $result->emailDispatched ? 'success' : 'warning',
+            $result->emailDispatched
+                ? 'Convite enviado. O link também está disponível abaixo para validação local.'
+                : 'Convite criado, mas o envio do e-mail falhou. Use o link abaixo e consulte o log.',
+        );
     }
 
     public function toggleStatus(

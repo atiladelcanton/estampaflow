@@ -19,7 +19,7 @@ beforeEach(function (): void {
     Notification::fake();
 });
 
-function invitationTenant(User $owner): Tenant
+function createInvitationFlowTenant(User $owner): Tenant
 {
     $tenant = Tenant::query()->create([
         'id' => (string) Str::ulid(),
@@ -46,7 +46,7 @@ function invitationTenant(User $owner): Tenant
 it('stores invitation token only as hash and accepts it for matching email', function (): void {
     $owner = User::factory()->create();
     $invited = User::factory()->create(['email' => 'convite@example.com']);
-    $tenant = invitationTenant($owner);
+    $tenant = createInvitationFlowTenant($owner);
 
     $created = app(InviteTenantUserAction::class)->execute(
         $tenant,
@@ -71,7 +71,7 @@ it('stores invitation token only as hash and accepts it for matching email', fun
 it('rejects acceptance by a different email', function (): void {
     $owner = User::factory()->create();
     $wrongUser = User::factory()->create(['email' => 'other@example.com']);
-    $tenant = invitationTenant($owner);
+    $tenant = createInvitationFlowTenant($owner);
 
     $created = app(InviteTenantUserAction::class)->execute(
         $tenant,
@@ -88,7 +88,7 @@ it('rejects acceptance by a different email', function (): void {
 
 it('prevents duplicate pending invitation for the same tenant and email', function (): void {
     $owner = User::factory()->create();
-    $tenant = invitationTenant($owner);
+    $tenant = createInvitationFlowTenant($owner);
     $action = app(InviteTenantUserAction::class);
 
     $action->execute($tenant, $owner, 'same@example.com', TenantRole::USER);

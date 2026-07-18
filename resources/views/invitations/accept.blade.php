@@ -1,3 +1,3 @@
-<x-layouts.app title="Aceitar convite • Delka Estamparia">
+<x-layouts.guest title="Aceitar convite • EstampaFlow">
     <livewire:accept-invitation :token="$token" />
-</x-layouts.app>
+</x-layouts.guest>

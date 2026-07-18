@@ -8,6 +8,7 @@ use App\Http\Middleware\EnsureActiveTenantMembership;
 use App\Http\Middleware\EnsureTenantOwner;
 use App\Http\Middleware\InitializeTenancyForRequest;
 use App\Support\Audit\AuditLogger;
+use App\Support\Auth\AuthenticatedDestinationResolver;
 use App\Support\Correlation\CorrelationContext;
 use App\Support\Tenancy\StanclTenantContext;
 use App\Support\Tenancy\TenantContext;
@@ -27,6 +28,7 @@ final class AppServiceProvider extends ServiceProvider
         $this->app->scoped(TenantMembershipService::class);
         $this->app->scoped(TenantUrlGenerator::class);
         $this->app->scoped(AuditLogger::class);
+        $this->app->scoped(AuthenticatedDestinationResolver::class);
     }
 
     public function boot(): void

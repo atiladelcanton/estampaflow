@@ -1,13 +1,13 @@
-<x-layouts.guest title="Entrar • Delka">
+<x-layouts.guest title="Entrar • EstampaFlow">
     <div class="grid min-h-screen lg:grid-cols-[.92fr_1.08fr]">
         <section class="flex min-h-screen items-center justify-center bg-white px-6 py-12 sm:px-10 lg:px-16">
             <div class="w-full max-w-[430px]">
                 <x-brand />
 
                 <div class="mt-14">
-                    <span class="status-badge status-info">Conta multi-tenant</span>
+                    <span class="status-badge status-info">Acesso EstampaFlow</span>
                     <h1 class="mt-5 text-4xl font-extrabold tracking-tight text-ink-950">Bem-vindo de volta <span aria-hidden="true">👋</span></h1>
-                    <p class="mt-3 text-sm leading-6 text-ink-400">Entre na sua conta global e escolha a estamparia que deseja acessar.</p>
+                    <p class="mt-3 text-sm leading-6 text-ink-400">Entre e você será direcionado automaticamente para a sua estamparia.</p>
                 </div>
 
                 @if (session('status'))

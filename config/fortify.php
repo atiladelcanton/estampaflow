@@ -10,7 +10,7 @@ return [
     'username' => 'email',
     'email' => 'email',
     'lowercase_usernames' => true,
-    'home' => '/dashboard',
+    'home' => '/dashboard', // Platform Admin; usuários comuns usam respostas customizadas.
     'prefix' => '',
     'domain' => env('CENTRAL_DOMAIN', 'app.estamparia.test'),
     'views' => true,

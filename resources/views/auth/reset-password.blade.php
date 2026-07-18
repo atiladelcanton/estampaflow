@@ -1,4 +1,4 @@
-<x-layouts.guest title="Redefinir senha • Delka">
+<x-layouts.guest title="Redefinir senha • EstampaFlow">
     <div class="grid min-h-screen place-items-center bg-app px-6 py-12">
         <div class="w-full max-w-md rounded-[28px] border border-line bg-white p-8 shadow-card">
             <x-brand />

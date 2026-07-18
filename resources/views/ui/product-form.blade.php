@@ -1,4 +1,4 @@
-<x-layouts.app title="Novo produto • Delka">
+<x-layouts.app title="Novo produto • EstampaFlow">
     <div class="page-shell pb-28">
         <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div><p class="text-xs font-bold uppercase tracking-[.18em] text-brand-600">Demonstração visual</p><h1 class="page-title mt-2">Adicionar produto</h1><p class="page-description">Formulário de referência. O salvamento será implementado na Sprint 4.</p></div>

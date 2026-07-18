@@ -1,9 +1,9 @@
-<x-layouts.app title="Guia visual • Delka">
+<x-layouts.app title="Guia visual • EstampaFlow">
     <div class="page-shell">
-        <div class="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between"><div><p class="text-xs font-bold uppercase tracking-[.18em] text-brand-600">Design system</p><h1 class="page-title mt-2">Guia visual da Delka</h1><p class="page-description">Tokens e componentes aprovados para todas as próximas sprints.</p></div><span class="status-badge status-success">Versão 1.0</span></div>
+        <div class="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between"><div><p class="text-xs font-bold uppercase tracking-[.18em] text-brand-600">Design system</p><h1 class="page-title mt-2">Guia visual do EstampaFlow</h1><p class="page-description">Tokens e componentes aprovados para todas as próximas sprints.</p></div><span class="status-badge status-success">Versão 1.0</span></div>
 
         <section class="mt-8 surface-card p-6"><h2 class="text-sm font-extrabold">Paleta principal</h2><div class="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-            @foreach ([['#FFFFFF','Branco','Fundo principal','bg-white border'],['#EFFFFA','Menta','Fundo suave','bg-surface-mint'],['#E5ECF4','Azul gelo','Superfície','bg-surface-blue'],['#C3BEF7','Lavanda','Apoio','bg-brand-300'],['#8A4FFF','Roxo Delka','Primária','bg-brand-500 text-white']] as [$hex,$name,$use,$class])
+            @foreach ([['#FFFFFF','Branco','Fundo principal','bg-white border'],['#EFFFFA','Menta','Fundo suave','bg-surface-mint'],['#E5ECF4','Azul gelo','Superfície','bg-surface-blue'],['#C3BEF7','Lavanda','Apoio','bg-brand-300'],['#8A4FFF','Roxo EstampaFlow','Primária','bg-brand-500 text-white']] as [$hex,$name,$use,$class])
                 <div class="overflow-hidden rounded-2xl border border-line"><div class="h-28 {{ $class }}"></div><div class="p-4"><p class="text-sm font-bold">{{ $name }}</p><p class="mt-1 font-mono text-xs text-ink-500">{{ $hex }}</p><p class="mt-2 text-[11px] text-ink-400">{{ $use }}</p></div></div>
             @endforeach
         </div></section>

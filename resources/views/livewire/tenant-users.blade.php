@@ -9,9 +9,10 @@
     </div>
 
     @if(session('success'))
-        <div class="mt-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm font-semibold text-emerald-700">
-            {{ session('success') }}
-        </div>
+        <div class="mt-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm font-semibold text-emerald-700">{{ session('success') }}</div>
+    @endif
+    @if(session('warning'))
+        <div class="mt-6 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm font-semibold text-amber-700">{{ session('warning') }}</div>
     @endif
 
     @if($inviteUrl)
@@ -21,7 +22,7 @@
                 <input value="{{ $inviteUrl }}" readonly class="field-input flex-1 font-mono text-xs">
                 <button type="button" class="button-primary" onclick="navigator.clipboard.writeText(@js($inviteUrl))">Copiar link</button>
             </div>
-            <p class="mt-2 text-[11px] text-brand-700/70">No ambiente local, o e-mail também aparece em <code>storage/logs/laravel.log</code>.</p>
+            <p class="mt-2 text-[11px] text-brand-700/70">Em ambiente local, o envio e a URL são registrados em <code>storage/logs/laravel.log</code>.</p>
         </div>
     @endif
 

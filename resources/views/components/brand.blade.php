@@ -10,8 +10,8 @@
     </div>
     @unless($compact)
         <div class="min-w-0 leading-tight">
-            <p @class(['truncate text-[15px] font-extrabold tracking-tight', 'text-ink-950' => ! $light, 'text-white' => $light])>DELKA</p>
-            <p @class(['mt-0.5 truncate text-[10px] font-semibold uppercase tracking-[.18em]', 'text-ink-400' => ! $light, 'text-white/65' => $light])>Gestão de Estamparia</p>
+            <p @class(['truncate text-[15px] font-extrabold tracking-tight', 'text-ink-950' => ! $light, 'text-white' => $light])>ESTAMPAFLOW</p>
+            <p @class(['mt-0.5 truncate text-[10px] font-semibold uppercase tracking-[.18em]', 'text-ink-400' => ! $light, 'text-white/65' => $light])>Gestão para Estamparias</p>
         </div>
     @endunless
 </div>

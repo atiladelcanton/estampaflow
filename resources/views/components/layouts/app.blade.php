@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ $title ?? 'Delka Estamparia' }}</title>
+    <title>{{ $title ?? 'EstampaFlow' }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
 </head>
@@ -58,28 +58,13 @@
                     </div>
                 @endforeach
             @else
-                <p x-show="! sidebarCollapsed" class="px-3 pb-2 text-[10px] font-bold uppercase tracking-[.18em] text-ink-400">Conta</p>
-
-                <a href="{{ route('central.dashboard') }}" @class(['nav-item', 'nav-item-active' => request()->routeIs('central.dashboard')]) title="Ambientes">
-                    <x-icon name="grid" />
-                    <span x-show="! sidebarCollapsed">Meus ambientes</span>
-                </a>
-                <a href="{{ route('central.onboarding') }}" @class(['nav-item', 'nav-item-active' => request()->routeIs('central.onboarding')]) title="Criar estamparia">
-                    <x-icon name="plus" />
-                    <span x-show="! sidebarCollapsed">Criar estamparia</span>
-                </a>
-
+                <p x-show="! sidebarCollapsed" class="px-3 pb-2 text-[10px] font-bold uppercase tracking-[.18em] text-ink-400">Plataforma</p>
+                <a href="{{ route('platform.dashboard') }}" @class(['nav-item', 'nav-item-active' => request()->routeIs('platform.dashboard')]) title="Clientes SaaS"><x-icon name="grid" /><span x-show="! sidebarCollapsed">Clientes SaaS</span></a>
+                <div class="nav-item nav-item-disabled" title="Cobranças — Sprint 9"><x-icon name="calculator" /><span x-show="! sidebarCollapsed">Cobranças</span><span x-show="! sidebarCollapsed" class="nav-pill">Sprint 9</span></div>
                 <div class="my-4 border-t border-line"></div>
                 <p x-show="! sidebarCollapsed" class="px-3 pb-2 text-[10px] font-bold uppercase tracking-[.18em] text-ink-400">Fundação visual</p>
-                <a href="{{ route('ui.products') }}" @class(['nav-item', 'nav-item-active' => request()->routeIs('ui.products*')]) title="Produtos demo">
-                    <x-icon name="shirt" />
-                    <span x-show="! sidebarCollapsed">Produtos</span>
-                    <span x-show="! sidebarCollapsed" class="nav-pill">Demo</span>
-                </a>
-                <a href="{{ route('ui.style-guide') }}" @class(['nav-item', 'nav-item-active' => request()->routeIs('ui.style-guide')]) title="Guia visual">
-                    <x-icon name="palette" />
-                    <span x-show="! sidebarCollapsed">Guia visual</span>
-                </a>
+                <a href="{{ route('ui.products') }}" @class(['nav-item', 'nav-item-active' => request()->routeIs('ui.products*')]) title="Produtos demo"><x-icon name="shirt" /><span x-show="! sidebarCollapsed">Produtos</span><span x-show="! sidebarCollapsed" class="nav-pill">Demo</span></a>
+                <a href="{{ route('ui.style-guide') }}" @class(['nav-item', 'nav-item-active' => request()->routeIs('ui.style-guide')]) title="Guia visual"><x-icon name="palette" /><span x-show="! sidebarCollapsed">Guia visual</span></a>
             @endif
         </nav>
 
@@ -103,14 +88,13 @@
             <button type="button" class="icon-button lg:hidden" @click="sidebarOpen = true" aria-label="Abrir menu"><x-icon name="menu" /></button>
 
             @if($currentTenant)
-                <a href="{{ route('central.dashboard') }}" class="hidden items-center gap-3 rounded-2xl border border-line bg-white px-3 py-2 shadow-sm transition hover:border-brand-300 md:flex">
+                <div class="hidden items-center gap-3 rounded-2xl border border-line bg-white px-3 py-2 shadow-sm md:flex">
                     <span class="grid size-8 place-items-center rounded-xl bg-brand-100 text-xs font-extrabold text-brand-700">{{ str($currentTenant->name)->substr(0, 2)->upper() }}</span>
                     <span>
                         <span class="block max-w-48 truncate text-xs font-bold text-ink-800">{{ $currentTenant->name }}</span>
-                        <span class="block text-[10px] text-ink-400">Trocar ambiente</span>
+                        <span class="block text-[10px] text-ink-400">Ambiente atual</span>
                     </span>
-                    <x-icon name="chevron-down" class="size-4 text-ink-300" />
-                </a>
+                </div>
             @else
                 <div class="hidden max-w-xl flex-1 items-center gap-3 rounded-2xl bg-app px-4 py-3 md:flex">
                     <x-icon name="search" class="size-4 text-ink-400" />

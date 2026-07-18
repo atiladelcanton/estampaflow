@@ -88,3 +88,15 @@ make add-host DOMAIN=minha-estamparia.estamparia.test
 ```
 
 Depois abra `http://minha-estamparia.estamparia.test:8000`.
+
+
+## Correção do fluxo de cadastro e convites
+
+Após aplicar o patch incremental:
+
+```bash
+chmod +x scripts/upgrade-sprint-1-flow.sh
+./scripts/upgrade-sprint-1-flow.sh
+```
+
+O cadastro público agora cria a estamparia automaticamente. O dashboard do domínio central é exclusivo do Platform Admin. Convites aceitam usuários existentes e permitem cadastrar usuários novos diretamente pelo link.

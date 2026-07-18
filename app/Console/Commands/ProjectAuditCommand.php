@@ -24,10 +24,12 @@ final class ProjectAuditCommand extends Command
             ['Stancl TenantContext', File::exists(app_path('Support/Tenancy/StanclTenantContext.php'))],
             ['Tenant middleware', File::exists(app_path('Http/Middleware/EnsureActiveTenantMembership.php'))],
             ['Owner middleware', File::exists(app_path('Http/Middleware/EnsureTenantOwner.php'))],
-            ['Onboarding', File::exists(app_path('Livewire/TenantOnboarding.php'))],
+            ['Cadastro cria tenant', File::exists(app_path('Application/Tenancy/Actions/RegisterTenantOwnerAction.php'))],
+            ['Platform Admin middleware', File::exists(app_path('Http/Middleware/EnsurePlatformAdmin.php'))],
+            ['Convite público completo', File::exists(app_path('Application/Tenancy/Actions/RegisterInvitedUserAction.php'))],
             ['Equipe', File::exists(app_path('Livewire/TenantUsers.php'))],
             ['MySQL 8.4', str_contains((string) File::get(base_path('compose.yaml')), 'mysql:8.4')],
-            ['ADRs', count(File::glob(base_path('docs/adr/????-*.md')) ?: []) === 10],
+            ['ADRs', count(File::glob(base_path('docs/adr/????-*.md')) ?: []) === 11],
             ['Design system', File::exists(base_path('docs/ui/style-guide.md'))],
         ];
 

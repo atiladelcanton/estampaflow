@@ -5,6 +5,7 @@ use App\Console\Commands\DocsGenerateCommand;
 use App\Console\Commands\ProjectAuditCommand;
 use App\Http\Middleware\AttachCorrelationId;
 use App\Http\Middleware\EnsureActiveTenantMembership;
+use App\Http\Middleware\EnsurePlatformAdmin;
 use App\Http\Middleware\EnsureTenantOwner;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -22,6 +23,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->alias([
+            'platform.admin' => EnsurePlatformAdmin::class,
             'tenant.member' => EnsureActiveTenantMembership::class,
             'tenant.owner' => EnsureTenantOwner::class,
         ]);

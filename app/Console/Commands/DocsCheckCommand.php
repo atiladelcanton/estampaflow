@@ -16,7 +16,7 @@ final class DocsCheckCommand extends Command
         $errors = [];
 
         $requiredFiles = [
-            'delka-estamparia-contexto-v2.3.md',
+            'delka-estamparia-contexto-v2.4.md',
             'docs/adr/README.md',
             'docs/sprints/sprint-00-foundation.md',
             'docs/sprints/sprint-00-audit-report.md',
@@ -24,6 +24,7 @@ final class DocsCheckCommand extends Command
             'docs/sprints/sprint-01-tenancy-users.md',
             'docs/sprints/sprint-01-implementation-report.md',
             'docs/sprints/sprint-01-source-validation.md',
+            'docs/sprints/sprint-01-flow-correction.md',
             'docs/domains/tenancy/README.md',
             'docs/ui/style-guide.md',
         ];
@@ -36,8 +37,8 @@ final class DocsCheckCommand extends Command
 
         $adrFiles = collect(File::glob(base_path('docs/adr/????-*.md')) ?: []);
 
-        if ($adrFiles->count() !== 10) {
-            $errors[] = 'Devem existir exatamente 10 ADRs numerados de 0001 a 0010.';
+        if ($adrFiles->count() !== 11) {
+            $errors[] = 'Devem existir exatamente 11 ADRs numerados de 0001 a 0011.';
         }
 
         foreach ($adrFiles as $adr) {

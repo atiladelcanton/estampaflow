@@ -1,3 +1,3 @@
-<x-layouts.app title="Seus ambientes • Delka Estamparia">
-    <livewire:workspace-selector />
+<x-layouts.app title="Administração • EstampaFlow">
+    <livewire:platform-dashboard />
 </x-layouts.app>

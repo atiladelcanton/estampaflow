@@ -43,6 +43,7 @@ Uma funcionalidade descrita no contexto não deve ser chamada de implementada se
 | [0008](0008-production-snapshots-and-artwork-model.md) | Snapshots e artes | ACCEPTED |
 | [0009](0009-database-id-and-money-strategy.md) | Banco, IDs, Money e Rate | ACCEPTED |
 | [0010](0010-livewire-authentication-and-billing-stack.md) | Stack e billing | ACCEPTED |
+| [0011](0011-registration-invitations-and-platform-boundary.md) | Cadastro, convites e Platform Admin | ACCEPTED |
 
 ## Fluxo mínimo validado pela arquitetura
 

@@ -6,4 +6,6 @@ parameters:
     paths:
         - app
     tmpDir: storage/framework/cache/phpstan
-    checkMissingIterableValueType: false
+    ignoreErrors:
+        -
+            identifier: missingType.iterableValue
