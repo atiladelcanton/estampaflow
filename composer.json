@@ -59,7 +59,7 @@
         ],
         "lint": "pint",
         "lint:check": "pint --test",
-        "types:check": "phpstan analyse",
+        "types:check": "phpstan analyse --memory-limit=1G",
         "refactor:check": "rector process --dry-run",
         "test": [
             "@php artisan config:clear --ansi",
