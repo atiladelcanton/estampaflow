@@ -1,0 +1,130 @@
+@import "tailwindcss";
+
+@source "../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php";
+@source "../views/**/*.blade.php";
+@source "../js/**/*.js";
+
+@theme {
+    --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+    --color-brand-50: #f8f6ff;
+    --color-brand-100: #eeeaff;
+    --color-brand-200: #ddd6ff;
+    --color-brand-300: #c3bef7;
+    --color-brand-400: #a88afc;
+    --color-brand-500: #8a4fff;
+    --color-brand-600: #7138e6;
+    --color-brand-700: #5d2dc0;
+
+    --color-surface-mint: #effffa;
+    --color-surface-blue: #e5ecf4;
+    --color-line: #e5e8ef;
+    --color-app: #f7f8fb;
+
+    --color-ink-50: #f7f7f9;
+    --color-ink-100: #ededf1;
+    --color-ink-200: #d7d8df;
+    --color-ink-300: #b5b7c1;
+    --color-ink-400: #888b98;
+    --color-ink-500: #626573;
+    --color-ink-600: #4a4c58;
+    --color-ink-700: #383943;
+    --color-ink-800: #272730;
+    --color-ink-900: #1d1b24;
+    --color-ink-950: #14121a;
+
+    --shadow-soft: 0 8px 30px rgba(20, 18, 26, .06);
+    --shadow-card: 0 16px 50px rgba(38, 25, 69, .08);
+}
+
+[x-cloak] { display: none !important; }
+
+@layer base {
+    * { border-color: var(--color-line); }
+    body { font-feature-settings: "cv02", "cv03", "cv04", "cv11"; }
+    button, a, input, select, textarea { outline-offset: 2px; }
+    ::selection { background: #c3bef7; color: #14121a; }
+}
+
+@layer components {
+    .button-primary {
+        @apply inline-flex items-center justify-center gap-2 rounded-xl bg-brand-500 px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-brand-500/20 transition duration-200 hover:-translate-y-0.5 hover:bg-brand-600 hover:shadow-brand-500/30 focus-visible:outline-2 focus-visible:outline-brand-500 disabled:pointer-events-none disabled:opacity-50;
+    }
+
+    .button-secondary {
+        @apply inline-flex items-center justify-center gap-2 rounded-xl border border-line bg-white px-4 py-2.5 text-sm font-bold text-ink-700 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-brand-300 hover:text-brand-700 focus-visible:outline-2 focus-visible:outline-brand-500;
+    }
+
+    .button-ghost {
+        @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-ink-500 transition hover:bg-app hover:text-ink-950;
+    }
+
+    .icon-button {
+        @apply relative grid size-10 shrink-0 place-items-center rounded-xl text-ink-500 transition hover:bg-app hover:text-brand-600 focus-visible:outline-2 focus-visible:outline-brand-500;
+    }
+
+    .nav-item {
+        @apply mb-1 flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-semibold text-ink-500 transition duration-150 hover:bg-brand-50 hover:text-brand-700;
+    }
+
+    .nav-item-active {
+        @apply bg-brand-50 text-brand-700;
+        box-shadow: inset 3px 0 0 #8a4fff;
+    }
+
+    .nav-item-disabled {
+        @apply cursor-not-allowed text-ink-300 hover:bg-transparent hover:text-ink-300;
+    }
+
+    .nav-pill {
+        @apply ml-auto rounded-full bg-brand-100 px-2 py-0.5 font-extrabold uppercase tracking-wide text-brand-700;
+        font-size: 9px;
+    }
+
+    .page-shell { @apply mx-auto w-full px-4 py-6 sm:px-6 lg:px-8 lg:py-8; max-width: 1600px; }
+    .page-title { @apply text-2xl font-extrabold tracking-tight text-ink-950 sm:text-3xl; }
+    .page-description { @apply mt-2 max-w-2xl text-sm leading-6 text-ink-500; }
+
+    .surface-card { @apply rounded-2xl border border-line bg-white shadow-soft; }
+    .surface-card-header { @apply flex items-center justify-between gap-4 border-b border-line px-5 py-4; }
+
+    .field-label { @apply mb-2 block text-xs font-bold text-ink-700; }
+    .field-input { @apply w-full rounded-xl border border-line bg-white px-4 py-3 text-sm text-ink-950 shadow-sm transition placeholder:text-ink-300 hover:border-ink-200 focus:border-brand-400 focus:ring-4 focus:ring-brand-100; }
+    .field-help { @apply mt-1.5 leading-5 text-ink-400; font-size: 11px; }
+    .field-error { @apply mt-1.5 block text-xs font-semibold text-red-500; }
+
+    .status-badge { @apply inline-flex items-center rounded-full px-2.5 py-1 font-bold; font-size: 10px; }
+    .status-success { @apply bg-emerald-50 text-emerald-700; }
+    .status-warning { @apply bg-amber-50 text-amber-700; }
+    .status-danger { @apply bg-red-50 text-red-600; }
+    .status-info { @apply bg-brand-50 text-brand-700; }
+    .status-neutral { @apply bg-ink-100 text-ink-600; }
+
+    .metric-card { @apply rounded-2xl border border-line bg-white p-5 shadow-soft transition duration-200 hover:-translate-y-0.5 hover:shadow-card; }
+    .metric-label { @apply text-xs font-semibold text-ink-400; }
+    .metric-value { @apply mt-3 text-3xl font-extrabold tracking-tight text-ink-950; }
+    .metric-help { @apply mt-1 text-ink-400; font-size: 11px; }
+
+    .quick-card { @apply flex min-h-28 flex-col justify-between rounded-2xl border border-line bg-white p-4 text-left shadow-soft transition duration-200 hover:-translate-y-1 hover:border-brand-300 hover:shadow-card; }
+    .quick-card-icon { @apply grid size-11 place-items-center rounded-2xl bg-app text-ink-500 transition group-hover:bg-brand-100 group-hover:text-brand-700; }
+
+    .table-shell { @apply overflow-hidden rounded-2xl border border-line bg-white shadow-soft; }
+    .data-table { @apply w-full border-collapse text-left; min-width: 880px; }
+    .data-table thead { @apply bg-app/80; }
+    .data-table th { @apply border-b border-line px-5 py-3 font-extrabold uppercase text-ink-400; font-size: 10px; letter-spacing: .12em; }
+    .data-table td { @apply border-b border-line px-5 py-4 text-sm text-ink-600; }
+    .data-table tbody tr { @apply transition hover:bg-brand-50/40; }
+    .data-table tbody tr:last-child td { @apply border-b-0; }
+
+    .auth-panel-pattern {
+        background-color: #f8f6ff;
+        background-image:
+            radial-gradient(circle at 15% 20%, rgba(138,79,255,.15), transparent 28%),
+            radial-gradient(circle at 85% 72%, rgba(195,190,247,.38), transparent 25%),
+            repeating-radial-gradient(ellipse at 70% 35%, transparent 0 22px, rgba(138,79,255,.07) 23px 24px);
+    }
+}
+
+@layer components {
+    .workspace-ring { @apply ring-4 ring-brand-100; }
+}

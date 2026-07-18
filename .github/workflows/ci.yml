@@ -1,0 +1,107 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_DATABASE: delka_test
+          MYSQL_USER: delka
+          MYSQL_PASSWORD: secret
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -proot"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: bcmath, intl, pdo_mysql, zip
+          coverage: none
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - run: cp .env.example .env
+      - run: composer install --no-interaction --prefer-dist --no-progress
+      - run: php artisan key:generate
+      - run: npm install
+      - run: npm run build
+
+      - name: Configure database
+        run: |
+          sed -i 's/DB_HOST=127.0.0.1/DB_HOST=127.0.0.1/' .env
+          sed -i 's/DB_DATABASE=delka_estamparia/DB_DATABASE=delka_test/' .env
+          php artisan migrate --force
+
+      - run: vendor/bin/pint --test
+      - run: vendor/bin/phpstan analyse
+      - run: vendor/bin/rector process --dry-run
+      - run: php artisan docs:check
+      - run: php artisan test
+
+  e2e:
+    runs-on: ubuntu-latest
+    needs: quality
+
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_DATABASE: delka_estamparia
+          MYSQL_USER: delka
+          MYSQL_PASSWORD: secret
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -proot"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=30
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: bcmath, intl, pdo_mysql, zip
+          coverage: none
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - run: cp .env.example .env
+      - run: composer install --no-interaction --prefer-dist --no-progress
+      - run: php artisan key:generate
+      - run: npm install
+      - run: npm run build
+      - run: php artisan migrate --seed --force
+      - run: npx playwright install --with-deps chromium
+      - run: php artisan serve --host=127.0.0.1 --port=8000 > /tmp/delka-server.log 2>&1 &
+      - name: Wait for application
+        run: |
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:8000/up >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/delka-server.log
+          exit 1
+      - run: npx playwright test
