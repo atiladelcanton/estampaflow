@@ -1,4 +1,4 @@
-# Delka Estamparia — Sprint 1
+# EstampaFlow — Sprint 1
 
 SaaS multi-tenant para gestão de estamparias, com Laravel 13, Livewire 4, Tailwind 4, Fortify, MySQL 8.4 e `stancl/tenancy`.
 
@@ -18,7 +18,7 @@ O script:
 5. migra e executa seeds;
 6. compila o frontend;
 7. valida documentação;
-8. sobe a aplicação.
+8. sobe a aplicação, Mailpit e worker de filas.
 
 ## URLs
 
@@ -26,6 +26,7 @@ O script:
 Central:      http://app.estamparia.test:8000
 Tenant Alpha: http://alpha.estamparia.test:8000
 Saúde:        http://app.estamparia.test:8000/up
+Mailpit:      http://localhost:8025
 ```
 
 ## Acessos
@@ -100,3 +101,30 @@ chmod +x scripts/upgrade-sprint-1-flow.sh
 ```
 
 O cadastro público agora cria a estamparia automaticamente. O dashboard do domínio central é exclusivo do Platform Admin. Convites aceitam usuários existentes e permitem cadastrar usuários novos diretamente pelo link.
+
+
+## E-mail local e filas
+
+O ambiente local usa Mailpit:
+
+```text
+http://localhost:8025
+```
+
+Convites são enviados pela fila `mail`. Domínios são processados pela fila `provisioning`.
+
+```bash
+make queue-logs
+make queue-failed
+make queue-retry
+make provision-domains
+```
+
+Para aplicar esta evolução em uma instalação existente:
+
+```bash
+chmod +x scripts/upgrade-sprint-1-async.sh
+./scripts/upgrade-sprint-1-async.sh
+```
+
+Em hospedagem compartilhada, consulte `scripts/shared-hosting-queue-cron.example.sh`.

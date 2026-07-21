@@ -57,7 +57,7 @@ O script `make hosts` adiciona os hosts necessários.
 - usuário sem membership recebe 403;
 - Owner acessa equipe;
 - User não acessa equipe;
-- convite cria link e e-mail em log;
+- convite cria link e e-mail visível no Mailpit por fila database;
 - aceite exige o mesmo e-mail;
 - último Owner permanece protegido;
 - testes e build passam.

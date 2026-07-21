@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Application\Tenancy\Actions\AcceptTenantInvitationAction;
 use App\Application\Tenancy\Actions\InviteTenantUserAction;
+use App\Application\Tenancy\Jobs\SendTenantInvitationEmailJob;
 use App\Domains\Tenancy\Enums\MembershipStatus;
 use App\Domains\Tenancy\Enums\TenantRole;
 use App\Domains\Tenancy\Enums\TenantStatus;
@@ -13,6 +14,7 @@ use App\Models\AuditLog;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
@@ -20,6 +22,7 @@ uses(RefreshDatabase::class);
 
 beforeEach(function (): void {
     Notification::fake();
+    Queue::fake();
 });
 
 function createInvitationFlowTenant(User $owner): Tenant
@@ -64,9 +67,11 @@ it('stores invitation token only as hash, audits delivery and accepts it for mat
     expect($created->invitation->token_hash)
         ->toBe(hash('sha256', $created->plainToken))
         ->not->toContain($created->plainToken)
-        ->and($created->emailDispatched)->toBeTrue()
+        ->and($created->emailQueued)->toBeTrue()
         ->and(AuditLog::query()->where('action', 'tenant.invitation.created')->exists())->toBeTrue()
-        ->and(AuditLog::query()->where('action', 'tenant.invitation.email_dispatched')->exists())->toBeTrue();
+        ->and(AuditLog::query()->where('action', 'tenant.invitation.email_queued')->exists())->toBeTrue();
+
+    Queue::assertPushed(SendTenantInvitationEmailJob::class);
 
     $membership = app(AcceptTenantInvitationAction::class)->execute(
         $created->plainToken,

@@ -24,7 +24,7 @@ echo "Construindo imagem PHP..."
 docker compose build app
 
 echo "Subindo MySQL 8.4..."
-docker compose up -d mysql
+docker compose up -d mysql mailpit
 
 echo "Aguardando banco..."
 until docker compose exec -T mysql mysqladmin ping -h localhost -proot --silent >/dev/null 2>&1; do
@@ -41,6 +41,7 @@ fi
 
 echo "Executando migrations e seed..."
 docker compose run --rm app php artisan migrate --seed --force
+docker compose run --rm app php artisan domain:provision-pending
 
 echo "Instalando dependências frontend..."
 docker compose run --rm node npm install
@@ -54,7 +55,7 @@ docker compose run --rm app php artisan docs:check
 docker compose run --rm app php artisan project:audit --write
 
 echo "Subindo aplicação..."
-docker compose up -d app
+docker compose up -d app queue mailpit
 
 cat <<'EOF'
 
@@ -77,6 +78,12 @@ Acessos:
 
 Saúde:
   http://app.estamparia.test:8000/up
+
+Mailpit:
+  http://localhost:8025
+
+Fila:
+  docker compose logs -f queue
 
 Logs:
   docker compose logs -f app

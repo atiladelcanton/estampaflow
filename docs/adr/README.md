@@ -1,6 +1,6 @@
 # ADRs — Delka Estamparia
 
-Os ADRs deste diretório complementam o Contexto Mestre v2.3.
+Os ADRs deste diretório complementam o Contexto Mestre v2.6.
 
 ## Fontes normativas
 
@@ -44,6 +44,7 @@ Uma funcionalidade descrita no contexto não deve ser chamada de implementada se
 | [0009](0009-database-id-and-money-strategy.md) | Banco, IDs, Money e Rate | ACCEPTED |
 | [0010](0010-livewire-authentication-and-billing-stack.md) | Stack e billing | ACCEPTED |
 | [0011](0011-registration-invitations-and-platform-boundary.md) | Cadastro, convites e Platform Admin | ACCEPTED |
+| [0012](0012-database-queue-mailpit-and-domain-provisioning.md) | Fila database, Mailpit e domínios | ACCEPTED |
 
 ## Fluxo mínimo validado pela arquitetura
 

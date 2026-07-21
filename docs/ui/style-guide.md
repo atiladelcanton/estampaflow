@@ -102,3 +102,20 @@ No ambiente tenant, o header deve mostrar:
 - ações destrutivas com confirmação;
 - proteção do Owner refletida no estado disabled;
 - link de convite visível apenas após criação local.
+
+
+## E-mails transacionais
+
+Os e-mails do EstampaFlow seguem a mesma identidade da aplicação:
+
+- fundo geral `#F7F8FB`;
+- superfície branca;
+- destaque primário `#8A4FFF`;
+- superfície auxiliar `#EFFFFA`;
+- apoio roxo `#C3BEF7` / `#EEEAFF`;
+- texto principal escuro;
+- card com borda suave e raio visual equivalente a 16–22 px;
+- botão principal roxo;
+- versão HTML com estilos inline e versão texto puro.
+
+E-mails nunca devem depender de JavaScript, CSS externo ou imagens remotas para transmitir informação essencial.

@@ -51,10 +51,10 @@ final class TenantUsers extends Component
         $this->role = TenantRole::USER->value;
 
         session()->flash(
-            $result->emailDispatched ? 'success' : 'warning',
-            $result->emailDispatched
-                ? 'Convite enviado. O link também está disponível abaixo para validação local.'
-                : 'Convite criado, mas o envio do e-mail falhou. Use o link abaixo e consulte o log.',
+            $result->emailQueued ? 'success' : 'warning',
+            $result->emailQueued
+                ? 'Convite enfileirado. Abra o Mailpit para acompanhar o envio; o link também aparece abaixo.'
+                : 'Convite criado, mas não foi possível enfileirar o e-mail. Use o link abaixo e consulte o log.',
         );
     }
 

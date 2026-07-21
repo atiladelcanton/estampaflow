@@ -12,7 +12,7 @@ final readonly class CreatedInvitationData
         public TenantInvitation $invitation,
         public string $plainToken,
         public string $acceptUrl,
-        public bool $emailDispatched,
-        public ?string $deliveryError = null,
+        public bool $emailQueued,
+        public ?string $queueError = null,
     ) {}
 }

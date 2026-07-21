@@ -1,6 +1,6 @@
 # Índice de Classes
 
-> Atualizado para a correção de fluxo da Sprint 1.
+> Gerado por `php artisan docs:generate`.
 
 | Classe | Arquivo | Métodos públicos declarados |
 |---|---|---|
@@ -20,13 +20,17 @@
 | `App\Application\Tenancy\Data\RegisterTenantOwnerData` | `app/Application/Tenancy/Data/RegisterTenantOwnerData.php` | `__construct()` |
 | `App\Application\Tenancy\Data\RegisteredInvitedUserData` | `app/Application/Tenancy/Data/RegisteredInvitedUserData.php` | `__construct()` |
 | `App\Application\Tenancy\Data\RegisteredTenantOwnerData` | `app/Application/Tenancy/Data/RegisteredTenantOwnerData.php` | `__construct()` |
+| `App\Application\Tenancy\Jobs\ProvisionTenantDomainJob` | `app/Application/Tenancy/Jobs/ProvisionTenantDomainJob.php` | `__construct()`, `uniqueId()`, `backoff()`, `handle()`, `failed()`, `dispatch()`, `dispatchIf()`, `dispatchUnless()`, `dispatchSync()`, `dispatchAfterResponse()`, `withChain()`, `attempts()`, `delete()`, `fail()`, `release()`, `withFakeQueueInteractions()`, `assertDeleted()`, `assertNotDeleted()`, `assertFailed()`, `assertFailedWith()`, `assertNotFailed()`, `assertReleased()`, `assertNotReleased()`, `setJob()`, `onConnection()`, `onQueue()`, `onGroup()`, `withDeduplicator()`, `allOnConnection()`, `allOnQueue()`, `delay()`, `withoutDelay()`, `afterCommit()`, `beforeCommit()`, `through()`, `chain()`, `prependToChain()`, `appendToChain()`, `dispatchNextJobInChain()`, `invokeChainCatchCallbacks()`, `assertHasChain()`, `assertDoesntHaveChain()`, `__serialize()`, `__unserialize()`, `restoreModel()` |
+| `App\Application\Tenancy\Jobs\SendTenantInvitationEmailJob` | `app/Application/Tenancy/Jobs/SendTenantInvitationEmailJob.php` | `__construct()`, `uniqueId()`, `backoff()`, `handle()`, `failed()`, `dispatch()`, `dispatchIf()`, `dispatchUnless()`, `dispatchSync()`, `dispatchAfterResponse()`, `withChain()`, `attempts()`, `delete()`, `fail()`, `release()`, `withFakeQueueInteractions()`, `assertDeleted()`, `assertNotDeleted()`, `assertFailed()`, `assertFailedWith()`, `assertNotFailed()`, `assertReleased()`, `assertNotReleased()`, `setJob()`, `onConnection()`, `onQueue()`, `onGroup()`, `withDeduplicator()`, `allOnConnection()`, `allOnQueue()`, `delay()`, `withoutDelay()`, `afterCommit()`, `beforeCommit()`, `through()`, `chain()`, `prependToChain()`, `appendToChain()`, `dispatchNextJobInChain()`, `invokeChainCatchCallbacks()`, `assertHasChain()`, `assertDoesntHaveChain()`, `__serialize()`, `__unserialize()`, `restoreModel()` |
 | `App\Console\Commands\DocsCheckCommand` | `app/Console/Commands/DocsCheckCommand.php` | `handle()` |
 | `App\Console\Commands\DocsGenerateCommand` | `app/Console/Commands/DocsGenerateCommand.php` | `handle()` |
 | `App\Console\Commands\ProjectAuditCommand` | `app/Console/Commands/ProjectAuditCommand.php` | `handle()` |
+| `App\Console\Commands\ProvisionPendingDomainsCommand` | `app/Console/Commands/ProvisionPendingDomainsCommand.php` | `handle()` |
 | `App\Domains\Tenancy\Exceptions\TenantAuthorizationException` | `app/Domains/Tenancy/Exceptions/TenantAuthorizationException.php` | — |
-| `App\Domains\Tenancy\Models\Tenant` | `app/Domains/Tenancy/Models/Tenant.php` | `getCustomColumns()`, `memberships()`, `users()`, `invitations()`, `isActive()`, `isTrialActive()`, `primaryDomain()` |
-| `App\Domains\Tenancy\Models\TenantInvitation` | `app/Domains/Tenancy/Models/TenantInvitation.php` | `tenant()`, `inviter()`, `acceptedBy()`, `isPending()`, `markExpired()` |
-| `App\Domains\Tenancy\Models\TenantMembership` | `app/Domains/Tenancy/Models/TenantMembership.php` | `tenant()`, `user()`, `inviter()`, `isActive()`, `isOwner()` |
+| `App\Domains\Tenancy\Models\Domain` | `app/Domains/Tenancy/Models/Domain.php` | `tenant()`, `markProcessing()`, `markProvisioned()`, `markFailed()`, `isProvisioned()` |
+| `App\Domains\Tenancy\Models\Tenant` | `app/Domains/Tenancy/Models/Tenant.php` | `getCustomColumns()`, `domains()`, `memberships()`, `users()`, `invitations()`, `isActive()`, `isTrialActive()`, `primaryDomain()`, `createDomain()` |
+| `App\Domains\Tenancy\Models\TenantInvitation` | `app/Domains/Tenancy/Models/TenantInvitation.php` | `tenant()`, `inviter()`, `acceptedBy()`, `hasExpired()`, `isPending()`, `markExpired()`, `getKeyType()`, `getIncrementing()`, `resolveRouteBindingQuery()`, `newUniqueId()`, `uniqueIds()`, `initializeHasUniqueStringIds()` |
+| `App\Domains\Tenancy\Models\TenantMembership` | `app/Domains/Tenancy/Models/TenantMembership.php` | `tenant()`, `user()`, `inviter()`, `isActive()`, `isOwner()`, `getKeyType()`, `getIncrementing()`, `resolveRouteBindingQuery()`, `newUniqueId()`, `uniqueIds()`, `initializeHasUniqueStringIds()` |
 | `App\Domains\Tenancy\Services\TenantMembershipService` | `app/Domains/Tenancy/Services/TenantMembershipService.php` | `assertActiveMember()`, `assertOwner()`, `activeOwnerCount()`, `assertCanRemoveOwner()` |
 | `App\Http\Middleware\AttachCorrelationId` | `app/Http/Middleware/AttachCorrelationId.php` | `__construct()`, `handle()` |
 | `App\Http\Middleware\EnsureActiveTenantMembership` | `app/Http/Middleware/EnsureActiveTenantMembership.php` | `__construct()`, `handle()` |
@@ -40,9 +44,9 @@
 | `App\Livewire\ProductPreview` | `app/Livewire/ProductPreview.php` | `visibleProducts()`, `clearFilters()`, `render()` |
 | `App\Livewire\TenantDashboard` | `app/Livewire/TenantDashboard.php` | `render()` |
 | `App\Livewire\TenantUsers` | `app/Livewire/TenantUsers.php` | `invite()`, `toggleStatus()`, `changeRole()`, `transferOwnership()`, `revokeInvitation()`, `render()` |
-| `App\Models\AuditLog` | `app/Models/AuditLog.php` | — |
-| `App\Models\User` | `app/Models/User.php` | `memberships()`, `tenants()`, `activeMembershipFor()` |
-| `App\Notifications\TenantInvitationNotification` | `app/Notifications/TenantInvitationNotification.php` | `__construct()`, `via()`, `toMail()` |
+| `App\Models\AuditLog` | `app/Models/AuditLog.php` | `getKeyType()`, `getIncrementing()`, `resolveRouteBindingQuery()`, `newUniqueId()`, `uniqueIds()`, `initializeHasUniqueStringIds()` |
+| `App\Models\User` | `app/Models/User.php` | `memberships()`, `tenants()`, `activeMembershipFor()`, `getKeyType()`, `getIncrementing()`, `resolveRouteBindingQuery()`, `newUniqueId()`, `uniqueIds()`, `factory()`, `initializeHasUniqueStringIds()`, `notifications()`, `readNotifications()`, `unreadNotifications()`, `notify()`, `notifyNow()`, `routeNotificationFor()` |
+| `App\Notifications\TenantInvitationNotification` | `app/Notifications/TenantInvitationNotification.php` | `__construct()`, `via()`, `toMail()`, `onConnection()`, `onQueue()`, `onGroup()`, `withDeduplicator()`, `allOnConnection()`, `allOnQueue()`, `delay()`, `withoutDelay()`, `afterCommit()`, `beforeCommit()`, `through()`, `chain()`, `prependToChain()`, `appendToChain()`, `dispatchNextJobInChain()`, `invokeChainCatchCallbacks()`, `assertHasChain()`, `assertDoesntHaveChain()` |
 | `App\Providers\AppServiceProvider` | `app/Providers/AppServiceProvider.php` | `register()`, `boot()` |
 | `App\Providers\FortifyServiceProvider` | `app/Providers/FortifyServiceProvider.php` | `register()`, `boot()` |
 | `App\Support\Audit\AuditEntryData` | `app/Support/Audit/AuditEntryData.php` | `__construct()` |

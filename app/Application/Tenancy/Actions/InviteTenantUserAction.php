@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Application\Tenancy\Actions;
 
 use App\Application\Tenancy\Data\CreatedInvitationData;
+use App\Application\Tenancy\Jobs\SendTenantInvitationEmailJob;
 use App\Domains\Tenancy\Enums\InvitationStatus;
 use App\Domains\Tenancy\Enums\MembershipStatus;
 use App\Domains\Tenancy\Enums\TenantRole;
@@ -12,13 +13,11 @@ use App\Domains\Tenancy\Models\Tenant;
 use App\Domains\Tenancy\Models\TenantInvitation;
 use App\Domains\Tenancy\Services\TenantMembershipService;
 use App\Models\User;
-use App\Notifications\TenantInvitationNotification;
 use App\Support\Audit\AuditEntryData;
 use App\Support\Audit\AuditLogger;
 use App\Support\Tenancy\TenantUrlGenerator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Throwable;
@@ -53,7 +52,6 @@ final readonly class InviteTenantUserAction
         $acceptUrl = $this->urls->central('/convites/'.$plainToken);
 
         $invitation = DB::transaction(function () use (
-
             $tenantId,
             $actor,
             $email,
@@ -105,24 +103,26 @@ final readonly class InviteTenantUserAction
             return $invitation;
         });
 
-        $emailDispatched = false;
-        $deliveryError = null;
+        $emailQueued = false;
+        $queueError = null;
 
         try {
-            Notification::route('mail', $normalizedEmail)
-                ->notify(new TenantInvitationNotification($tenant->name, $role->label(), $acceptUrl));
+            SendTenantInvitationEmailJob::dispatch(
+                (string) $invitation->getKey(),
+                $plainToken,
+            );
 
-            $emailDispatched = true;
+            $emailQueued = true;
 
-            Log::channel('single')->info('tenant.invitation.email_dispatched', [
+            Log::info('tenant.invitation.email_queued', [
                 'tenant_id' => $tenantId,
                 'invitation_id' => (string) $invitation->getKey(),
                 'to' => $normalizedEmail,
-                'accept_url' => app()->environment('local') ? $acceptUrl : '[hidden]',
+                'queue' => 'mail',
             ]);
 
             $this->auditLogger->record(new AuditEntryData(
-                action: 'tenant.invitation.email_dispatched',
+                action: 'tenant.invitation.email_queued',
                 tenantId: $tenantId,
                 actorId: (string) $actor->getKey(),
                 auditableType: TenantInvitation::class,
@@ -130,40 +130,27 @@ final readonly class InviteTenantUserAction
                 after: [
                     'channel' => 'mail',
                     'recipient' => $normalizedEmail,
+                    'queue' => 'mail',
                 ],
             ));
         } catch (Throwable $exception) {
-            $deliveryError = $exception->getMessage();
+            $queueError = $exception->getMessage();
             report($exception);
 
-            Log::channel('single')->error('tenant.invitation.email_failed', [
+            Log::error('tenant.invitation.email_queue_failed', [
                 'tenant_id' => $tenantId,
                 'invitation_id' => (string) $invitation->getKey(),
                 'to' => $normalizedEmail,
-                'exception' => $exception::class,
-                'error' => $deliveryError,
+                'error' => $queueError,
             ]);
-
-            $this->auditLogger->record(new AuditEntryData(
-                action: 'tenant.invitation.email_failed',
-                tenantId: $tenantId,
-                actorId: (string) $actor->getKey(),
-                auditableType: TenantInvitation::class,
-                auditableId: (string) $invitation->getKey(),
-                after: [
-                    'channel' => 'mail',
-                    'recipient' => $normalizedEmail,
-                    'exception' => $exception::class,
-                ],
-            ));
         }
 
         return new CreatedInvitationData(
             invitation: $invitation,
             plainToken: $plainToken,
             acceptUrl: $acceptUrl,
-            emailDispatched: $emailDispatched,
-            deliveryError: $deliveryError,
+            emailQueued: $emailQueued,
+            queueError: $queueError,
         );
     }
 }

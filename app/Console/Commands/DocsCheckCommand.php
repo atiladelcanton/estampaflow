@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
@@ -14,9 +16,20 @@ final class DocsCheckCommand extends Command
     public function handle(): int
     {
         $errors = [];
+        $contextVersion = config('project.context_version');
+        $contextFile = config('project.context_file');
+
+        if (! is_string($contextVersion) || $contextVersion === '') {
+            $errors[] = 'A versão do contexto não foi definida em config/project.php.';
+        }
+
+        if (! is_string($contextFile) || $contextFile === '') {
+            $errors[] = 'O arquivo do contexto não foi definido em config/project.php.';
+            $contextFile = '__contexto_nao_configurado__.md';
+        }
 
         $requiredFiles = [
-            'delka-estamparia-contexto-v2.4.md',
+            $contextFile,
             'docs/adr/README.md',
             'docs/sprints/sprint-00-foundation.md',
             'docs/sprints/sprint-00-audit-report.md',
@@ -25,6 +38,8 @@ final class DocsCheckCommand extends Command
             'docs/sprints/sprint-01-implementation-report.md',
             'docs/sprints/sprint-01-source-validation.md',
             'docs/sprints/sprint-01-flow-correction.md',
+            'docs/sprints/sprint-01-async-infrastructure.md',
+            'docs/sprints/sprint-01-welcome-email.md',
             'docs/domains/tenancy/README.md',
             'docs/ui/style-guide.md',
         ];
@@ -35,10 +50,20 @@ final class DocsCheckCommand extends Command
             }
         }
 
+        $adrReadmePath = base_path('docs/adr/README.md');
+
+        if (
+            is_string($contextVersion)
+            && File::exists($adrReadmePath)
+            && ! str_contains((string) File::get($adrReadmePath), "Contexto Mestre v{$contextVersion}")
+        ) {
+            $errors[] = "O índice de ADRs não referencia o Contexto Mestre v{$contextVersion}.";
+        }
+
         $adrFiles = collect(File::glob(base_path('docs/adr/????-*.md')) ?: []);
 
-        if ($adrFiles->count() !== 11) {
-            $errors[] = 'Devem existir exatamente 11 ADRs numerados de 0001 a 0011.';
+        if ($adrFiles->count() !== 12) {
+            $errors[] = 'Devem existir exatamente 12 ADRs numerados de 0001 a 0012.';
         }
 
         foreach ($adrFiles as $adr) {
@@ -55,7 +80,7 @@ final class DocsCheckCommand extends Command
             return self::FAILURE;
         }
 
-        $this->info('Documentação obrigatória das Sprints 0 e 1 validada.');
+        $this->info("Documentação obrigatória das Sprints 0 e 1 validada com o Contexto Mestre v{$contextVersion}.");
 
         return self::SUCCESS;
     }

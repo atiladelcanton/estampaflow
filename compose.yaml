@@ -11,6 +11,25 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
+      mailpit:
+        condition: service_started
+    networks:
+      - delka
+
+  queue:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    working_dir: /var/www/html
+    command: php artisan queue:work database --queue=provisioning,mail,default --sleep=1 --tries=3 --timeout=90 --max-time=3600
+    restart: unless-stopped
+    volumes:
+      - .:/var/www/html
+    depends_on:
+      mysql:
+        condition: service_healthy
+      mailpit:
+        condition: service_started
     networks:
       - delka
 
@@ -31,6 +50,18 @@ services:
       interval: 5s
       timeout: 5s
       retries: 30
+    networks:
+      - delka
+
+  mailpit:
+    image: axllent/mailpit:latest
+    restart: unless-stopped
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    environment:
+      MP_SMTP_AUTH_ACCEPT_ANY: "1"
+      MP_SMTP_AUTH_ALLOW_INSECURE: "1"
     networks:
       - delka
 

@@ -1,9 +1,9 @@
 <?php
 
+use App\Domains\Tenancy\Models\Domain;
 use App\Domains\Tenancy\Models\Tenant;
 use App\Support\Tenancy\UlidTenantIdGenerator;
 use Stancl\Tenancy\Bootstrappers\QueueTenancyBootstrapper;
-use Stancl\Tenancy\Database\Models\Domain;
 
 return [
     /*

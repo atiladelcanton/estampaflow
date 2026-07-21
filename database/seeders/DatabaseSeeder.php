@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Domains\Tenancy\Enums\DomainProvisioningStatus;
 use App\Domains\Tenancy\Enums\MembershipStatus;
 use App\Domains\Tenancy\Enums\TenantRole;
 use App\Domains\Tenancy\Enums\TenantStatus;
@@ -49,7 +50,10 @@ final class DatabaseSeeder extends Seeder
 
         $tenant->domains()->updateOrCreate(
             ['domain' => 'alpha.'.config('tenancy.tenant_base_domain')],
-            [],
+            [
+                'provisioning_status' => DomainProvisioningStatus::PROVISIONED,
+                'provisioned_at' => now(),
+            ],
         );
 
         TenantMembership::query()->updateOrCreate(

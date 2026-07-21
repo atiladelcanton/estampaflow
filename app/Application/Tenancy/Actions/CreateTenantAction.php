@@ -1,11 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Application\Tenancy\Actions;
 
 use App\Application\Tenancy\Data\CreateTenantData;
+use App\Application\Tenancy\Jobs\ProvisionTenantDomainJob;
+use App\Domains\Tenancy\Enums\DomainProvisioningStatus;
 use App\Domains\Tenancy\Enums\MembershipStatus;
 use App\Domains\Tenancy\Enums\TenantRole;
 use App\Domains\Tenancy\Enums\TenantStatus;
+use App\Domains\Tenancy\Models\Domain;
 use App\Domains\Tenancy\Models\Tenant;
 use App\Domains\Tenancy\Models\TenantMembership;
 use App\Support\Audit\AuditEntryData;
@@ -30,8 +35,10 @@ final readonly class CreateTenantAction
                 'data' => [],
             ]);
 
-            $tenant->domains()->create([
+            /** @var Domain $domain */
+            $domain = $tenant->domains()->create([
                 'domain' => mb_strtolower(trim($data->domain)),
+                'provisioning_status' => DomainProvisioningStatus::PENDING,
             ]);
 
             TenantMembership::query()->create([
@@ -51,9 +58,24 @@ final readonly class CreateTenantAction
                 after: [
                     'name' => $tenant->name,
                     'slug' => $tenant->slug,
-                    'domain' => $data->domain,
+                    'domain' => $domain->domain,
                 ],
             ));
+
+            $this->auditLogger->record(new AuditEntryData(
+                action: 'tenant.domain.provisioning_queued',
+                tenantId: (string) $tenant->getTenantKey(),
+                actorId: (string) $data->owner->getKey(),
+                auditableType: Domain::class,
+                auditableId: (string) $domain->getKey(),
+                after: [
+                    'domain' => $domain->domain,
+                    'status' => DomainProvisioningStatus::PENDING->value,
+                    'queue' => 'provisioning',
+                ],
+            ));
+
+            ProvisionTenantDomainJob::dispatch((int) $domain->getKey());
 
             return $tenant->load('domains');
         });

@@ -40,7 +40,7 @@ composer quality
 ## Riscos conhecidos
 
 - o desenvolvimento local depende das entradas em `/etc/hosts`;
-- envio de e-mail usa o mailer configurado; em local, fica em log;
+- envio de e-mail utiliza Mailpit local e fila database;
 - trial é persistido, mas o gate completo de assinatura pertence à Sprint 9;
 - o pacote é usado para identificação; o isolamento de Models operacionais será aplicado a partir da Sprint 2.
 
@@ -51,3 +51,12 @@ composer quality
 - o middleware encerra contexto residual antes de resolver o domínio atual;
 - testes de domínio passaram a usar URL absoluta, evitando que o host seja sobrescrito pelo cliente de testes;
 - incluído teste do fluxo de convite pelo componente Livewire.
+
+
+## Infraestrutura assíncrona
+
+- Mailpit local implementado;
+- filas database implementadas;
+- convites e provisionamento separados por queue;
+- cron compatível com hospedagem compartilhada documentado;
+- DNS de produção definido como wildcard.
