@@ -1,14 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Domains\Tenancy\Models;
 
 use App\Domains\Tenancy\Enums\MembershipStatus;
 use App\Domains\Tenancy\Enums\TenantRole;
 use App\Models\User;
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property string $id
+ * @property string $tenant_id
+ * @property string $user_id
+ * @property TenantRole $role
+ * @property MembershipStatus $status
+ * @property string|null $invited_by
+ * @property CarbonImmutable|null $joined_at
+ */
 final class TenantMembership extends Model
 {
     use HasUlids;

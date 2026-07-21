@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Application\Tenancy\Actions\AcceptTenantInvitationAction;
 use App\Application\Tenancy\Actions\InviteTenantUserAction;
 use App\Domains\Tenancy\Enums\MembershipStatus;
@@ -7,6 +9,7 @@ use App\Domains\Tenancy\Enums\TenantRole;
 use App\Domains\Tenancy\Enums\TenantStatus;
 use App\Domains\Tenancy\Models\Tenant;
 use App\Domains\Tenancy\Models\TenantMembership;
+use App\Models\AuditLog;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
@@ -30,7 +33,10 @@ function createInvitationFlowTenant(User $owner): Tenant
         'trial_ends_at' => now()->addDays(7),
         'data' => [],
     ]);
-    $tenant->domains()->create(['domain' => $tenant->slug.'.estamparia.test']);
+
+    $tenant->domains()->create([
+        'domain' => $tenant->slug.'.estamparia.test',
+    ]);
 
     TenantMembership::query()->create([
         'tenant_id' => $tenant->getTenantKey(),
@@ -43,7 +49,7 @@ function createInvitationFlowTenant(User $owner): Tenant
     return $tenant;
 }
 
-it('stores invitation token only as hash and accepts it for matching email', function (): void {
+it('stores invitation token only as hash, audits delivery and accepts it for matching email', function (): void {
     $owner = User::factory()->create();
     $invited = User::factory()->create(['email' => 'convite@example.com']);
     $tenant = createInvitationFlowTenant($owner);
@@ -57,7 +63,10 @@ it('stores invitation token only as hash and accepts it for matching email', fun
 
     expect($created->invitation->token_hash)
         ->toBe(hash('sha256', $created->plainToken))
-        ->not->toContain($created->plainToken);
+        ->not->toContain($created->plainToken)
+        ->and($created->emailDispatched)->toBeTrue()
+        ->and(AuditLog::query()->where('action', 'tenant.invitation.created')->exists())->toBeTrue()
+        ->and(AuditLog::query()->where('action', 'tenant.invitation.email_dispatched')->exists())->toBeTrue();
 
     $membership = app(AcceptTenantInvitationAction::class)->execute(
         $created->plainToken,
@@ -65,7 +74,8 @@ it('stores invitation token only as hash and accepts it for matching email', fun
     );
 
     expect($membership->status)->toBe(MembershipStatus::ACTIVE)
-        ->and($membership->tenant_id)->toBe($tenant->getTenantKey());
+        ->and($membership->tenant_id)->toBe($tenant->getTenantKey())
+        ->and(AuditLog::query()->where('action', 'tenant.invitation.accepted')->exists())->toBeTrue();
 });
 
 it('rejects acceptance by a different email', function (): void {

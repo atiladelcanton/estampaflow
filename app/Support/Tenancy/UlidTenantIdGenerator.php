@@ -1,16 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Support\Tenancy;
 
 use Illuminate\Support\Str;
-use Stancl\Tenancy\Contracts\TenantIdGenerator;
+use Stancl\Tenancy\Contracts\UniqueIdentifierGenerator;
 
-final class UlidTenantIdGenerator implements TenantIdGenerator
+final class UlidTenantIdGenerator implements UniqueIdentifierGenerator
 {
-    /**
-     * @param  list<string>  $domains
-     */
-    public function generate(array $domains): string
+    public static function generate(mixed $resource): string
     {
         return (string) Str::ulid();
     }

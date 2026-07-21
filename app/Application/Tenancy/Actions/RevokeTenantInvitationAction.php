@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Application\Tenancy\Actions;
 
 use App\Domains\Tenancy\Enums\InvitationStatus;
@@ -22,7 +24,7 @@ final readonly class RevokeTenantInvitationAction
         return DB::transaction(function () use ($actor, $invitation): TenantInvitation {
             $locked = TenantInvitation::query()->lockForUpdate()->findOrFail($invitation->getKey());
 
-            $this->memberships->assertOwner($actor, (string) $locked->tenant_id);
+            $this->memberships->assertOwner($actor, $locked->tenant_id);
 
             if ($locked->status !== InvitationStatus::PENDING) {
                 return $locked;
@@ -36,7 +38,7 @@ final readonly class RevokeTenantInvitationAction
 
             $this->auditLogger->record(new AuditEntryData(
                 action: 'tenant.invitation.revoked',
-                tenantId: (string) $locked->tenant_id,
+                tenantId: $locked->tenant_id,
                 actorId: (string) $actor->getKey(),
                 auditableType: TenantInvitation::class,
                 auditableId: (string) $locked->getKey(),

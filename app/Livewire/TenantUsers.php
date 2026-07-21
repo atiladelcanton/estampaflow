@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Livewire;
 
 use App\Application\Tenancy\Actions\ChangeTenantMembershipAction;
@@ -12,6 +14,7 @@ use App\Domains\Tenancy\Enums\TenantRole;
 use App\Domains\Tenancy\Models\Tenant;
 use App\Domains\Tenancy\Models\TenantInvitation;
 use App\Domains\Tenancy\Models\TenantMembership;
+use App\Models\User;
 use App\Support\Tenancy\TenantContext;
 use Illuminate\Contracts\View\View;
 use Illuminate\Validation\Rule;
@@ -38,7 +41,7 @@ final class TenantUsers extends Component
 
         $result = $action->execute(
             $tenant,
-            auth()->user(),
+            $this->authenticatedUser(),
             $validated['email'],
             TenantRole::from($validated['role']),
         );
@@ -46,6 +49,7 @@ final class TenantUsers extends Component
         $this->inviteUrl = $result->acceptUrl;
         $this->reset('email', 'role');
         $this->role = TenantRole::USER->value;
+
         session()->flash(
             $result->emailDispatched ? 'success' : 'warning',
             $result->emailDispatched
@@ -68,7 +72,7 @@ final class TenantUsers extends Component
             : MembershipStatus::ACTIVE;
 
         $action->execute(
-            auth()->user(),
+            $this->authenticatedUser(),
             $membership,
             status: $next,
             reason: 'Alteração realizada pela tela de equipe.',
@@ -88,7 +92,7 @@ final class TenantUsers extends Component
             ->findOrFail($membershipId);
 
         $action->execute(
-            auth()->user(),
+            $this->authenticatedUser(),
             $membership,
             role: TenantRole::from($role),
             reason: 'Papel alterado pela tela de equipe.',
@@ -107,7 +111,7 @@ final class TenantUsers extends Component
             ->findOrFail($membershipId);
 
         $action->execute(
-            auth()->user(),
+            $this->authenticatedUser(),
             $membership,
             'Transferência confirmada pela tela de equipe.',
         );
@@ -126,7 +130,7 @@ final class TenantUsers extends Component
             ->where('tenant_id', (string) $context->currentId())
             ->findOrFail($invitationId);
 
-        $action->execute(auth()->user(), $invitation);
+        $action->execute($this->authenticatedUser(), $invitation);
 
         session()->flash('success', 'Convite revogado.');
     }
@@ -148,5 +152,16 @@ final class TenantUsers extends Component
                 ->get(),
             'roles' => TenantRole::cases(),
         ]);
+    }
+
+    private function authenticatedUser(): User
+    {
+        $user = auth()->user();
+
+        if (! $user instanceof User) {
+            abort(401);
+        }
+
+        return $user;
     }
 }

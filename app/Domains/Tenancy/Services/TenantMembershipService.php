@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Domains\Tenancy\Services;
 
 use App\Domains\Tenancy\Enums\MembershipStatus;
@@ -51,7 +53,9 @@ final class TenantMembershipService
         }
 
         if ($this->activeOwnerCount($membership->tenant_id) <= 1) {
-            throw new TenantAuthorizationException('O último proprietário ativo não pode ser removido, suspenso ou rebaixado.');
+            throw new TenantAuthorizationException(
+                'O último proprietário ativo não pode ser removido, suspenso ou rebaixado.',
+            );
         }
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Application\Tenancy\Actions;
 
 use App\Domains\Tenancy\Enums\InvitationStatus;
@@ -30,7 +32,7 @@ final readonly class AcceptTenantInvitationAction
                 ]);
             }
 
-            if ($invitation->expires_at->isPast()) {
+            if ($invitation->hasExpired()) {
                 $invitation->markExpired();
 
                 throw ValidationException::withMessages([
@@ -66,7 +68,7 @@ final readonly class AcceptTenantInvitationAction
 
             $this->auditLogger->record(new AuditEntryData(
                 action: 'tenant.invitation.accepted',
-                tenantId: (string) $invitation->tenant_id,
+                tenantId: $invitation->tenant_id,
                 actorId: (string) $user->getKey(),
                 auditableType: TenantMembership::class,
                 auditableId: (string) $membership->getKey(),

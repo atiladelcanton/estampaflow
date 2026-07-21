@@ -6,6 +6,7 @@ namespace App\Application\Tenancy\Actions;
 
 use App\Application\Tenancy\Data\CreatedInvitationData;
 use App\Domains\Tenancy\Enums\InvitationStatus;
+use App\Domains\Tenancy\Enums\MembershipStatus;
 use App\Domains\Tenancy\Enums\TenantRole;
 use App\Domains\Tenancy\Models\Tenant;
 use App\Domains\Tenancy\Models\TenantInvitation;
@@ -32,36 +33,52 @@ final readonly class InviteTenantUserAction
 
     public function execute(Tenant $tenant, User $actor, string $email, TenantRole $role): CreatedInvitationData
     {
-        $this->memberships->assertOwner($actor, (string) $tenant->getTenantKey());
+        $tenantId = (string) $tenant->getTenantKey();
+        $this->memberships->assertOwner($actor, $tenantId);
+
         $normalizedEmail = mb_strtolower(trim($email));
 
         $alreadyMember = $tenant->memberships()
             ->whereHas('user', fn ($query) => $query->where('email', $normalizedEmail))
-            ->where('status', '!=', 'REVOKED')
+            ->where('status', '!=', MembershipStatus::REVOKED->value)
             ->exists();
 
         if ($alreadyMember) {
-            throw ValidationException::withMessages(['email' => 'Este e-mail já possui vínculo com a estamparia.']);
+            throw ValidationException::withMessages([
+                'email' => 'Este e-mail já possui vínculo com a estamparia.',
+            ]);
         }
 
         $plainToken = Str::random(64);
         $acceptUrl = $this->urls->central('/convites/'.$plainToken);
 
-        $invitation = DB::transaction(function () use ($tenant, $actor, $email, $normalizedEmail, $role, $plainToken): TenantInvitation {
+        $invitation = DB::transaction(function () use (
+
+            $tenantId,
+            $actor,
+            $email,
+            $normalizedEmail,
+            $role,
+            $plainToken,
+        ): TenantInvitation {
             $existing = TenantInvitation::query()
-                ->where('tenant_id', $tenant->getTenantKey())
+                ->where('tenant_id', $tenantId)
                 ->where('pending_email_key', $normalizedEmail)
                 ->lockForUpdate()
                 ->first();
 
-            if ($existing !== null && $existing->expires_at->isFuture()) {
-                throw ValidationException::withMessages(['email' => 'Já existe um convite pendente para este e-mail.']);
+            if ($existing?->isPending()) {
+                throw ValidationException::withMessages([
+                    'email' => 'Já existe um convite pendente para este e-mail.',
+                ]);
             }
 
-            $existing?->markExpired();
+            if ($existing !== null) {
+                $existing->markExpired();
+            }
 
             $invitation = TenantInvitation::query()->create([
-                'tenant_id' => $tenant->getTenantKey(),
+                'tenant_id' => $tenantId,
                 'email' => trim($email),
                 'email_normalized' => $normalizedEmail,
                 'pending_email_key' => $normalizedEmail,
@@ -74,11 +91,15 @@ final readonly class InviteTenantUserAction
 
             $this->auditLogger->record(new AuditEntryData(
                 action: 'tenant.invitation.created',
-                tenantId: (string) $tenant->getTenantKey(),
+                tenantId: $tenantId,
                 actorId: (string) $actor->getKey(),
                 auditableType: TenantInvitation::class,
                 auditableId: (string) $invitation->getKey(),
-                after: ['email' => $normalizedEmail, 'role' => $role->value, 'expires_at' => $invitation->expires_at?->toIso8601String()],
+                after: [
+                    'email' => $normalizedEmail,
+                    'role' => $role->value,
+                    'expires_at' => $invitation->expires_at->toIso8601String(),
+                ],
             ));
 
             return $invitation;
@@ -90,10 +111,11 @@ final readonly class InviteTenantUserAction
         try {
             Notification::route('mail', $normalizedEmail)
                 ->notify(new TenantInvitationNotification($tenant->name, $role->label(), $acceptUrl));
+
             $emailDispatched = true;
 
             Log::channel('single')->info('tenant.invitation.email_dispatched', [
-                'tenant_id' => (string) $tenant->getTenantKey(),
+                'tenant_id' => $tenantId,
                 'invitation_id' => (string) $invitation->getKey(),
                 'to' => $normalizedEmail,
                 'accept_url' => app()->environment('local') ? $acceptUrl : '[hidden]',
@@ -101,24 +123,47 @@ final readonly class InviteTenantUserAction
 
             $this->auditLogger->record(new AuditEntryData(
                 action: 'tenant.invitation.email_dispatched',
-                tenantId: (string) $tenant->getTenantKey(),
+                tenantId: $tenantId,
                 actorId: (string) $actor->getKey(),
                 auditableType: TenantInvitation::class,
                 auditableId: (string) $invitation->getKey(),
-                after: ['channel' => 'mail', 'recipient' => $normalizedEmail],
+                after: [
+                    'channel' => 'mail',
+                    'recipient' => $normalizedEmail,
+                ],
             ));
         } catch (Throwable $exception) {
             $deliveryError = $exception->getMessage();
             report($exception);
 
             Log::channel('single')->error('tenant.invitation.email_failed', [
-                'tenant_id' => (string) $tenant->getTenantKey(),
+                'tenant_id' => $tenantId,
                 'invitation_id' => (string) $invitation->getKey(),
                 'to' => $normalizedEmail,
+                'exception' => $exception::class,
                 'error' => $deliveryError,
             ]);
+
+            $this->auditLogger->record(new AuditEntryData(
+                action: 'tenant.invitation.email_failed',
+                tenantId: $tenantId,
+                actorId: (string) $actor->getKey(),
+                auditableType: TenantInvitation::class,
+                auditableId: (string) $invitation->getKey(),
+                after: [
+                    'channel' => 'mail',
+                    'recipient' => $normalizedEmail,
+                    'exception' => $exception::class,
+                ],
+            ));
         }
 
-        return new CreatedInvitationData($invitation, $plainToken, $acceptUrl, $emailDispatched, $deliveryError);
+        return new CreatedInvitationData(
+            invitation: $invitation,
+            plainToken: $plainToken,
+            acceptUrl: $acceptUrl,
+            emailDispatched: $emailDispatched,
+            deliveryError: $deliveryError,
+        );
     }
 }

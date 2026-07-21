@@ -1,14 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Domains\Tenancy\Models;
 
 use App\Domains\Tenancy\Enums\TenantStatus;
 use App\Models\User;
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Stancl\Tenancy\Database\Concerns\HasDomains;
+use Stancl\Tenancy\Database\Models\Domain;
 use Stancl\Tenancy\Database\Models\Tenant as BaseTenant;
 
+/**
+ * @property string $id
+ * @property string $name
+ * @property string $slug
+ * @property TenantStatus $status
+ * @property string $timezone
+ * @property CarbonImmutable|null $trial_ends_at
+ * @property array<string, mixed>|null $data
+ */
 final class Tenant extends BaseTenant
 {
     use HasDomains;
@@ -60,6 +73,17 @@ final class Tenant extends BaseTenant
     }
 
     /**
+     * Relação explícita para que Larastan e a aplicação compartilhem
+     * a mesma definição do recurso opcional de domínios do pacote.
+     *
+     * @return HasMany<Domain, $this>
+     */
+    public function domains(): HasMany
+    {
+        return $this->hasMany(Domain::class, 'tenant_id');
+    }
+
+    /**
      * @return HasMany<TenantMembership, $this>
      */
     public function memberships(): HasMany
@@ -92,11 +116,13 @@ final class Tenant extends BaseTenant
 
     public function isTrialActive(): bool
     {
-        return $this->trial_ends_at !== null && $this->trial_ends_at->isFuture();
+        return $this->trial_ends_at?->isFuture() ?? false;
     }
 
     public function primaryDomain(): ?string
     {
-        return $this->domains()->orderBy('id')->value('domain');
+        $domain = $this->domains()->orderBy('id')->value('domain');
+
+        return is_string($domain) ? $domain : null;
     }
 }

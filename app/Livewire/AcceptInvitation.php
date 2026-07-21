@@ -6,7 +6,6 @@ namespace App\Livewire;
 
 use App\Application\Tenancy\Actions\AcceptTenantInvitationAction;
 use App\Application\Tenancy\Actions\RegisterInvitedUserAction;
-use App\Domains\Tenancy\Enums\InvitationStatus;
 use App\Domains\Tenancy\Models\TenantInvitation;
 use App\Models\User;
 use App\Support\Tenancy\TenantUrlGenerator;
@@ -68,13 +67,18 @@ final class AcceptInvitation extends Component
             ->where('token_hash', hash('sha256', $this->token))
             ->first();
 
-        $available = $invitation !== null
-            && $invitation->status === InvitationStatus::PENDING
-            && $invitation->expires_at->isFuture();
+        $available = false;
+        $existingUser = false;
 
-        $existingUser = $available
-            ? User::query()->where('email', $invitation->email_normalized)->exists()
-            : false;
+        if ($invitation !== null) {
+            $available = $invitation->isPending();
+
+            if ($available) {
+                $existingUser = User::query()
+                    ->where('email', $invitation->email_normalized)
+                    ->exists();
+            }
+        }
 
         return view('livewire.accept-invitation', [
             'invitation' => $invitation,

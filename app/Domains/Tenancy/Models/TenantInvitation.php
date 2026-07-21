@@ -1,14 +1,32 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Domains\Tenancy\Models;
 
 use App\Domains\Tenancy\Enums\InvitationStatus;
 use App\Domains\Tenancy\Enums\TenantRole;
 use App\Models\User;
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property string $id
+ * @property string $tenant_id
+ * @property string $email
+ * @property string $email_normalized
+ * @property string|null $pending_email_key
+ * @property TenantRole $role
+ * @property InvitationStatus $status
+ * @property string $token_hash
+ * @property string $invited_by
+ * @property CarbonImmutable $expires_at
+ * @property CarbonImmutable|null $accepted_at
+ * @property string|null $accepted_by
+ * @property CarbonImmutable|null $revoked_at
+ */
 final class TenantInvitation extends Model
 {
     use HasUlids;
@@ -76,9 +94,14 @@ final class TenantInvitation extends Model
         return $this->belongsTo(User::class, 'accepted_by');
     }
 
+    public function hasExpired(): bool
+    {
+        return $this->expires_at->isPast();
+    }
+
     public function isPending(): bool
     {
-        return $this->status === InvitationStatus::PENDING && $this->expires_at->isFuture();
+        return $this->status === InvitationStatus::PENDING && ! $this->hasExpired();
     }
 
     public function markExpired(): void

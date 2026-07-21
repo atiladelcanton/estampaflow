@@ -25,7 +25,7 @@ final readonly class RegisterInvitedUserAction
                 ->lockForUpdate()
                 ->firstOrFail();
 
-            if ($invitation->status !== InvitationStatus::PENDING || $invitation->expires_at->isPast()) {
+            if ($invitation->status !== InvitationStatus::PENDING || $invitation->hasExpired()) {
                 throw ValidationException::withMessages([
                     'invitation' => 'Este convite não está mais disponível.',
                 ]);
@@ -45,7 +45,10 @@ final readonly class RegisterInvitedUserAction
 
             $membership = $this->acceptInvitation->execute($plainToken, $user);
 
-            return new RegisteredInvitedUserData($user, $membership->load('tenant.domains'));
+            return new RegisteredInvitedUserData(
+                user: $user,
+                membership: $membership->load('tenant.domains'),
+            );
         });
     }
 }

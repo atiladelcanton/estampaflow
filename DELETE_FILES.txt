@@ -1,5 +1,0 @@
-app/Livewire/TenantOnboarding.php
-app/Livewire/WorkspaceSelector.php
-resources/views/central/onboarding.blade.php
-resources/views/livewire/tenant-onboarding.blade.php
-resources/views/livewire/workspace-selector.blade.php

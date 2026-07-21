@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Application\Tenancy\Actions;
 
 use App\Domains\Tenancy\Enums\MembershipStatus;
@@ -27,7 +29,7 @@ final readonly class ChangeTenantMembershipAction
     ): TenantMembership {
         return DB::transaction(function () use ($actor, $target, $role, $status, $reason): TenantMembership {
             $locked = TenantMembership::query()->lockForUpdate()->findOrFail($target->getKey());
-            $this->memberships->assertOwner($actor, (string) $locked->tenant_id);
+            $this->memberships->assertOwner($actor, $locked->tenant_id);
 
             $removesActiveOwner = $locked->isOwner()
                 && $locked->isActive()
@@ -38,7 +40,7 @@ final readonly class ChangeTenantMembershipAction
                 $this->memberships->assertCanRemoveOwner($locked);
             }
 
-            if ((string) $locked->user_id === (string) $actor->getKey()
+            if ($locked->user_id === (string) $actor->getKey()
                 && $status !== null
                 && $status !== MembershipStatus::ACTIVE) {
                 throw new \DomainException('Você não pode suspender ou revogar o próprio acesso.');
@@ -56,7 +58,7 @@ final readonly class ChangeTenantMembershipAction
 
             $this->auditLogger->record(new AuditEntryData(
                 action: 'tenant.membership.changed',
-                tenantId: (string) $locked->tenant_id,
+                tenantId: $locked->tenant_id,
                 actorId: (string) $actor->getKey(),
                 auditableType: TenantMembership::class,
                 auditableId: (string) $locked->getKey(),
