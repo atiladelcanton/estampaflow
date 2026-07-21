@@ -1,8 +1,10 @@
 <?php
 
+use App\Console\Commands\BootstrapDefaultServiceCatalogCommand;
 use App\Console\Commands\DocsCheckCommand;
 use App\Console\Commands\DocsGenerateCommand;
 use App\Console\Commands\ProjectAuditCommand;
+use App\Console\Commands\ProvisionPendingDomainsCommand;
 use App\Http\Middleware\AttachCorrelationId;
 use App\Http\Middleware\EnsureActiveTenantMembership;
 use App\Http\Middleware\EnsurePlatformAdmin;
@@ -30,6 +32,8 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withCommands([
         DocsGenerateCommand::class,
+        BootstrapDefaultServiceCatalogCommand::class,
+        ProvisionPendingDomainsCommand::class,
         DocsCheckCommand::class,
         ProjectAuditCommand::class,
     ])

@@ -119,3 +119,35 @@ Os e-mails do EstampaFlow seguem a mesma identidade da aplicação:
 - versão HTML com estilos inline e versão texto puro.
 
 E-mails nunca devem depender de JavaScript, CSS externo ou imagens remotas para transmitir informação essencial.
+
+## Listagens administrativas de baixa frequência
+
+Telas administrativas pouco acessadas, cujo objetivo principal é consulta e manutenção, devem priorizar tabela convencional em vez de cards. A tabela deve:
+
+- manter busca e filtros acima da listagem;
+- usar `table-shell` e `data-table`;
+- permitir rolagem horizontal em telas estreitas;
+- concentrar ações na última coluna;
+- manter badges apenas para estado e classificação curta.
+
+A listagem de Tipos de serviço é a referência desse padrão.
+
+## Sidebar recolhida
+
+No desktop, a sidebar alterna entre `270px` e `92px`. O conteúdo principal deve alternar o `padding-left` usando classes mutuamente exclusivas, evitando manter simultaneamente os dois deslocamentos.
+
+Quando recolhida:
+
+- os ícones ficam centralizados;
+- o conteúdo ocupa imediatamente a largura liberada;
+- cada item exibe tooltip visual ao passar o mouse ou receber foco;
+- os itens mantêm `aria-label` para leitores de tela e navegação assistiva.
+
+## Configurações de baixa frequência
+
+- priorizar tabelas operacionais em vez de cards quando a comparação entre registros for mais importante;
+- serviços padrão devem funcionar sem configuração inicial;
+- esconder opções avançadas em divulgação progressiva;
+- termos de implementação como schema, draft, publish e version não aparecem na interface operacional;
+- alterações versionadas usam uma única ação visível: **Salvar alterações**;
+- identificadores internos são gerados automaticamente.

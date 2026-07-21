@@ -128,3 +128,15 @@
 @layer components {
     .workspace-ring { @apply ring-4 ring-brand-100; }
 }
+
+@layer components {
+    @media (min-width: 1024px) {
+        .sidebar-collapsed .nav-item {
+            @apply justify-center px-0;
+        }
+
+        .sidebar-collapsed .nav-item > svg {
+            @apply shrink-0;
+        }
+    }
+}

@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Domains\ServiceCatalog\Models\ServiceType;
 use App\Domains\Tenancy\Enums\InvitationStatus;
 use App\Domains\Tenancy\Enums\MembershipStatus;
 use App\Domains\Tenancy\Models\Tenant;
@@ -24,6 +25,8 @@ final class TenantDashboard extends Component
             'currentMembership' => $currentMembership,
             'membersCount' => $tenant->memberships()->where('status', MembershipStatus::ACTIVE->value)->count(),
             'pendingInvitations' => $tenant->invitations()->where('status', InvitationStatus::PENDING->value)->count(),
+            'serviceTypesCount' => ServiceType::query()->count(),
+            'activeServiceTypesCount' => ServiceType::query()->where('active', true)->count(),
         ]);
     }
 }

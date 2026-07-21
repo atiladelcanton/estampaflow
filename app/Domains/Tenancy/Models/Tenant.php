@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domains\Tenancy\Models;
 
+use App\Domains\ServiceCatalog\Models\ServiceType;
 use App\Domains\Tenancy\Enums\TenantStatus;
 use App\Models\User;
 use Carbon\CarbonImmutable;
@@ -106,6 +107,14 @@ final class Tenant extends BaseTenant
     public function invitations(): HasMany
     {
         return $this->hasMany(TenantInvitation::class);
+    }
+
+    /**
+     * @return HasMany<ServiceType, $this>
+     */
+    public function serviceTypes(): HasMany
+    {
+        return $this->hasMany(ServiceType::class);
     }
 
     public function isActive(): bool

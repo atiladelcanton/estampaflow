@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Domains\ServiceCatalog\Services\DefaultServiceCatalogService;
 use App\Domains\Tenancy\Enums\DomainProvisioningStatus;
 use App\Domains\Tenancy\Enums\MembershipStatus;
 use App\Domains\Tenancy\Enums\TenantRole;
@@ -9,6 +10,8 @@ use App\Domains\Tenancy\Enums\TenantStatus;
 use App\Domains\Tenancy\Models\Tenant;
 use App\Domains\Tenancy\Models\TenantMembership;
 use App\Models\User;
+use App\Support\Tenancy\TenantContext;
+use App\Support\Tenancy\TenantId;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
@@ -73,6 +76,11 @@ final class DatabaseSeeder extends Seeder
                 'invited_by' => $admin->getKey(),
                 'joined_at' => now(),
             ],
+        );
+
+        app(TenantContext::class)->run(
+            new TenantId((string) $tenant->getTenantKey()),
+            fn () => app(DefaultServiceCatalogService::class)->createDefaultsFor($admin),
         );
     }
 }

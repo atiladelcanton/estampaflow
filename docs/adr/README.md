@@ -1,6 +1,6 @@
 # ADRs — Delka Estamparia
 
-Os ADRs deste diretório complementam o Contexto Mestre v2.6.
+Os ADRs deste diretório complementam o Contexto Mestre v2.7.
 
 ## Fontes normativas
 

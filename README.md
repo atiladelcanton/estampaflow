@@ -1,4 +1,4 @@
-# EstampaFlow — Sprint 1
+# EstampaFlow — Sprint 2
 
 SaaS multi-tenant para gestão de estamparias, com Laravel 13, Livewire 4, Tailwind 4, Fortify, MySQL 8.4 e `stancl/tenancy`.
 
@@ -128,3 +128,14 @@ chmod +x scripts/upgrade-sprint-1-async.sh
 ```
 
 Em hospedagem compartilhada, consulte `scripts/shared-hosting-queue-cron.example.sh`.
+
+
+## Sprint 2 — Catálogo de serviços
+
+Após aplicar a atualização, acesse no domínio do tenant:
+
+```text
+/configuracoes/servicos
+```
+
+O Owner poderá configurar serviços, parâmetros e versões de schema. O motor de preços será implementado na Sprint 3.

@@ -15,3 +15,9 @@
 | 10 | Reporting | Relatórios e release |
 
 Cada sprint deve registrar objetivo, escopo, fora do escopo, estado inicial, ADRs, migrations, classes, logs, testes, validação manual, evidências, riscos, rollback e resultado.
+
+## Status atual
+
+- Sprint 0: concluída.
+- Sprint 1: concluída.
+- Sprint 2 — Catálogo dinâmico: pronta para validação.

@@ -41,6 +41,9 @@ final class DocsCheckCommand extends Command
             'docs/sprints/sprint-01-async-infrastructure.md',
             'docs/sprints/sprint-01-welcome-email.md',
             'docs/domains/tenancy/README.md',
+            'docs/sprints/sprint-02-service-catalog.md',
+            'docs/sprints/sprint-02-implementation-report.md',
+            'docs/domains/service-catalog/README.md',
             'docs/ui/style-guide.md',
         ];
 
@@ -80,7 +83,7 @@ final class DocsCheckCommand extends Command
             return self::FAILURE;
         }
 
-        $this->info("Documentação obrigatória das Sprints 0 e 1 validada com o Contexto Mestre v{$contextVersion}.");
+        $this->info("Documentação obrigatória das Sprints 0, 1 e 2 validada com o Contexto Mestre v{$contextVersion}.");
 
         return self::SUCCESS;
     }

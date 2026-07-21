@@ -15,6 +15,7 @@ final readonly class InitializeTenancyForRequest
 
     public function handle(Request $request, Closure $next): Response
     {
+
         // Garante que testes, workers persistentes e requisições subsequentes
         // nunca reutilizem acidentalmente o tenant de uma execução anterior.
         if (tenant() !== null) {

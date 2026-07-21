@@ -1,10 +1,16 @@
-.PHONY: setup upgrade hosts add-host start stop test quality e2e shell logs reset mailpit queue-logs queue-failed queue-retry provision-domains
+.PHONY: setup upgrade upgrade-sprint1 upgrade-sprint2 hosts add-host start stop test quality e2e shell logs reset mailpit queue-logs queue-failed queue-retry provision-domains
 
 setup:
 	./scripts/setup.sh
 
 upgrade:
+	./scripts/upgrade-sprint-2.sh
+
+upgrade-sprint1:
 	./scripts/upgrade-sprint-1.sh
+
+upgrade-sprint2:
+	./scripts/upgrade-sprint-2.sh
 
 hosts:
 	./scripts/configure-hosts.sh

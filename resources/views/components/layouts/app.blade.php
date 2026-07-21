@@ -8,17 +8,46 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
 </head>
-<body class="min-h-full bg-app text-ink-950 antialiased" x-data="{ sidebarOpen: false, sidebarCollapsed: false }">
+<body
+    class="min-h-full bg-app text-ink-950 antialiased"
+    x-data="{
+        sidebarOpen: false,
+        sidebarCollapsed: false,
+        sidebarTooltip: null,
+        toggleSidebar() {
+            this.sidebarCollapsed = ! this.sidebarCollapsed;
+            this.sidebarTooltip = null;
+        },
+        showSidebarTooltip(label, element) {
+            if (! this.sidebarCollapsed || window.innerWidth < 1024) {
+                return;
+            }
+
+            const bounds = element.getBoundingClientRect();
+            this.sidebarTooltip = {
+                label,
+                top: bounds.top + (bounds.height / 2),
+            };
+        },
+        hideSidebarTooltip() {
+            this.sidebarTooltip = null;
+        },
+    }"
+    @keydown.escape.window="sidebarOpen = false; hideSidebarTooltip()"
+>
     <div x-cloak x-show="sidebarOpen" x-transition.opacity class="fixed inset-0 z-40 bg-ink-950/25 backdrop-blur-[2px] lg:hidden" @click="sidebarOpen = false"></div>
 
     <aside
-        class="fixed inset-y-0 left-0 z-50 flex w-[270px] -translate-x-full flex-col border-r border-line bg-white transition-all duration-200 lg:translate-x-0"
-        :class="{ 'translate-x-0': sidebarOpen, 'lg:w-[92px]': sidebarCollapsed }"
+        class="fixed inset-y-0 left-0 z-50 flex w-[270px] -translate-x-full flex-col border-r border-line bg-white transition-[width,transform] duration-200 lg:translate-x-0"
+        :class="[
+            sidebarOpen ? 'translate-x-0' : '',
+            sidebarCollapsed ? 'lg:w-[92px] sidebar-collapsed' : 'lg:w-[270px]',
+        ]"
     >
         <div class="flex h-[74px] items-center justify-between border-b border-line px-5">
             <x-brand x-show="! sidebarCollapsed" />
             <div x-show="sidebarCollapsed" class="mx-auto"><x-brand compact /></div>
-            <button type="button" class="icon-button hidden lg:grid" @click="sidebarCollapsed = ! sidebarCollapsed" aria-label="Recolher menu">
+            <button type="button" class="icon-button hidden lg:grid" @click="toggleSidebar()" :aria-label="sidebarCollapsed ? 'Expandir menu' : 'Recolher menu'">
                 <x-icon name="menu" class="size-[18px]" />
             </button>
         </div>
@@ -27,16 +56,48 @@
             @if($currentTenant)
                 <p x-show="! sidebarCollapsed" class="px-3 pb-2 text-[10px] font-bold uppercase tracking-[.18em] text-ink-400">Ambiente</p>
 
-                <a href="{{ route('tenant.dashboard') }}" @class(['nav-item', 'nav-item-active' => request()->routeIs('tenant.dashboard')]) title="Visão geral">
+                <a
+                    href="{{ route('tenant.dashboard') }}"
+                    @class(['nav-item', 'nav-item-active' => request()->routeIs('tenant.dashboard')])
+                    aria-label="Visão geral"
+                    @mouseenter="showSidebarTooltip('Visão geral', $el)"
+                    @mouseleave="hideSidebarTooltip()"
+                    @focus="showSidebarTooltip('Visão geral', $el)"
+                    @blur="hideSidebarTooltip()"
+                >
                     <x-icon name="home" />
                     <span x-show="! sidebarCollapsed">Visão geral</span>
                 </a>
 
                 @if($currentMembership?->isOwner())
-                    <a href="{{ route('tenant.users') }}" @class(['nav-item', 'nav-item-active' => request()->routeIs('tenant.users')]) title="Equipe">
+                    <a
+                        href="{{ route('tenant.users') }}"
+                        @class(['nav-item', 'nav-item-active' => request()->routeIs('tenant.users')])
+                        aria-label="Equipe"
+                        @mouseenter="showSidebarTooltip('Equipe', $el)"
+                        @mouseleave="hideSidebarTooltip()"
+                        @focus="showSidebarTooltip('Equipe', $el)"
+                        @blur="hideSidebarTooltip()"
+                    >
                         <x-icon name="users" />
                         <span x-show="! sidebarCollapsed">Equipe</span>
                         <span x-show="! sidebarCollapsed" class="nav-pill">Sprint 1</span>
+                    </a>
+                @endif
+
+                @if($currentMembership?->isOwner())
+                    <a
+                        href="{{ route('tenant.service-types.index') }}"
+                        @class(['nav-item', 'nav-item-active' => request()->routeIs('tenant.service-types.*')])
+                        aria-label="Tipos de serviço"
+                        @mouseenter="showSidebarTooltip('Tipos de serviço', $el)"
+                        @mouseleave="hideSidebarTooltip()"
+                        @focus="showSidebarTooltip('Tipos de serviço', $el)"
+                        @blur="hideSidebarTooltip()"
+                    >
+                        <x-icon name="layers" />
+                        <span x-show="! sidebarCollapsed">Tipos de serviço</span>
+                        <span x-show="! sidebarCollapsed" class="nav-pill">Sprint 2</span>
                     </a>
                 @endif
 
@@ -44,14 +105,18 @@
                     ['users', 'Clientes', 'Sprint 5'],
                     ['shirt', 'Produtos', 'Sprint 4'],
                     ['box', 'Estoque', 'Sprint 4'],
-                    ['layers', 'Tipos de serviço', 'Sprint 2'],
                     ['calculator', 'Precificação', 'Sprint 3'],
                     ['file', 'Orçamentos', 'Sprint 5'],
                     ['factory', 'Produção', 'Sprint 7'],
                     ['palette', 'Artes', 'Sprint 7'],
                     ['chart', 'Relatórios', 'Sprint 10'],
                 ] as [$icon, $label, $sprint])
-                    <div class="nav-item nav-item-disabled" title="{{ $label }} — {{ $sprint }}">
+                    <div
+                        class="nav-item nav-item-disabled"
+                        aria-label="{{ $label }} — {{ $sprint }}"
+                        @mouseenter="showSidebarTooltip('{{ $label }} — {{ $sprint }}', $el)"
+                        @mouseleave="hideSidebarTooltip()"
+                    >
                         <x-icon :name="$icon" />
                         <span x-show="! sidebarCollapsed">{{ $label }}</span>
                         <span x-show="! sidebarCollapsed" class="ml-auto text-[9px] font-semibold uppercase tracking-wide text-ink-300">{{ $sprint }}</span>
@@ -59,12 +124,41 @@
                 @endforeach
             @else
                 <p x-show="! sidebarCollapsed" class="px-3 pb-2 text-[10px] font-bold uppercase tracking-[.18em] text-ink-400">Plataforma</p>
-                <a href="{{ route('platform.dashboard') }}" @class(['nav-item', 'nav-item-active' => request()->routeIs('platform.dashboard')]) title="Clientes SaaS"><x-icon name="grid" /><span x-show="! sidebarCollapsed">Clientes SaaS</span></a>
-                <div class="nav-item nav-item-disabled" title="Cobranças — Sprint 9"><x-icon name="calculator" /><span x-show="! sidebarCollapsed">Cobranças</span><span x-show="! sidebarCollapsed" class="nav-pill">Sprint 9</span></div>
+                <a
+                    href="{{ route('platform.dashboard') }}"
+                    @class(['nav-item', 'nav-item-active' => request()->routeIs('platform.dashboard')])
+                    aria-label="Clientes SaaS"
+                    @mouseenter="showSidebarTooltip('Clientes SaaS', $el)"
+                    @mouseleave="hideSidebarTooltip()"
+                    @focus="showSidebarTooltip('Clientes SaaS', $el)"
+                    @blur="hideSidebarTooltip()"
+                ><x-icon name="grid" /><span x-show="! sidebarCollapsed">Clientes SaaS</span></a>
+                <div
+                    class="nav-item nav-item-disabled"
+                    aria-label="Cobranças — Sprint 9"
+                    @mouseenter="showSidebarTooltip('Cobranças — Sprint 9', $el)"
+                    @mouseleave="hideSidebarTooltip()"
+                ><x-icon name="calculator" /><span x-show="! sidebarCollapsed">Cobranças</span><span x-show="! sidebarCollapsed" class="nav-pill">Sprint 9</span></div>
                 <div class="my-4 border-t border-line"></div>
                 <p x-show="! sidebarCollapsed" class="px-3 pb-2 text-[10px] font-bold uppercase tracking-[.18em] text-ink-400">Fundação visual</p>
-                <a href="{{ route('ui.products') }}" @class(['nav-item', 'nav-item-active' => request()->routeIs('ui.products*')]) title="Produtos demo"><x-icon name="shirt" /><span x-show="! sidebarCollapsed">Produtos</span><span x-show="! sidebarCollapsed" class="nav-pill">Demo</span></a>
-                <a href="{{ route('ui.style-guide') }}" @class(['nav-item', 'nav-item-active' => request()->routeIs('ui.style-guide')]) title="Guia visual"><x-icon name="palette" /><span x-show="! sidebarCollapsed">Guia visual</span></a>
+                <a
+                    href="{{ route('ui.products') }}"
+                    @class(['nav-item', 'nav-item-active' => request()->routeIs('ui.products*')])
+                    aria-label="Produtos demo"
+                    @mouseenter="showSidebarTooltip('Produtos demo', $el)"
+                    @mouseleave="hideSidebarTooltip()"
+                    @focus="showSidebarTooltip('Produtos demo', $el)"
+                    @blur="hideSidebarTooltip()"
+                ><x-icon name="shirt" /><span x-show="! sidebarCollapsed">Produtos</span><span x-show="! sidebarCollapsed" class="nav-pill">Demo</span></a>
+                <a
+                    href="{{ route('ui.style-guide') }}"
+                    @class(['nav-item', 'nav-item-active' => request()->routeIs('ui.style-guide')])
+                    aria-label="Guia visual"
+                    @mouseenter="showSidebarTooltip('Guia visual', $el)"
+                    @mouseleave="hideSidebarTooltip()"
+                    @focus="showSidebarTooltip('Guia visual', $el)"
+                    @blur="hideSidebarTooltip()"
+                ><x-icon name="palette" /><span x-show="! sidebarCollapsed">Guia visual</span></a>
             @endif
         </nav>
 
@@ -83,7 +177,20 @@
         </div>
     </aside>
 
-    <div class="min-h-screen transition-all duration-200 lg:pl-[270px]" :class="{ 'lg:pl-[92px]': sidebarCollapsed }">
+    <div
+        x-cloak
+        x-show="sidebarTooltip && sidebarCollapsed"
+        x-transition.opacity.duration.100ms
+        class="pointer-events-none fixed left-[104px] z-[70] -translate-y-1/2 rounded-lg bg-ink-950 px-3 py-2 text-xs font-semibold text-white shadow-xl"
+        :style="`top: ${sidebarTooltip?.top ?? 0}px`"
+        x-text="sidebarTooltip?.label"
+        role="tooltip"
+    ></div>
+
+    <div
+        class="min-h-screen transition-[padding] duration-200"
+        :class="sidebarCollapsed ? 'lg:pl-[92px]' : 'lg:pl-[270px]'"
+    >
         <header class="sticky top-0 z-30 flex h-[74px] items-center gap-4 border-b border-line bg-white/90 px-4 backdrop-blur-xl sm:px-6 lg:px-8">
             <button type="button" class="icon-button lg:hidden" @click="sidebarOpen = true" aria-label="Abrir menu"><x-icon name="menu" /></button>
 

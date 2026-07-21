@@ -2,7 +2,7 @@
     "$schema": "https://getcomposer.org/schema.json",
     "name": "delka/estamparia",
     "type": "project",
-    "description": "SaaS multi-tenant para gestão de estamparias — Delka Estamparia Sprint 1.",
+    "description": "SaaS multi-tenant para gestão de estamparias — EstampaFlow Sprint 2.",
     "keywords": [
         "laravel",
         "livewire",

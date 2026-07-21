@@ -8,9 +8,12 @@ use App\Application\Tenancy\Data\CreateTenantData;
 use App\Application\Tenancy\Data\RegisteredTenantOwnerData;
 use App\Application\Tenancy\Data\RegisterTenantOwnerData;
 use App\Application\Tenancy\Jobs\SendTenantWelcomeEmailJob;
+use App\Domains\ServiceCatalog\Services\DefaultServiceCatalogService;
 use App\Models\User;
 use App\Support\Audit\AuditEntryData;
 use App\Support\Audit\AuditLogger;
+use App\Support\Tenancy\TenantContext;
+use App\Support\Tenancy\TenantId;
 use App\Support\Tenancy\UniqueTenantSlugGenerator;
 use Illuminate\Support\Facades\DB;
 
@@ -19,6 +22,8 @@ final readonly class RegisterTenantOwnerAction
     public function __construct(
         private CreateTenantAction $createTenant,
         private UniqueTenantSlugGenerator $slugGenerator,
+        private TenantContext $tenantContext,
+        private DefaultServiceCatalogService $defaultCatalog,
         private AuditLogger $auditLogger,
     ) {}
 
@@ -40,6 +45,11 @@ final readonly class RegisterTenantOwnerAction
                 domain: $domain,
                 owner: $user,
             ));
+
+            $this->tenantContext->run(
+                new TenantId((string) $tenant->getTenantKey()),
+                fn () => $this->defaultCatalog->createDefaultsFor($user),
+            );
 
             SendTenantWelcomeEmailJob::dispatch(
                 userId: (string) $user->getKey(),
