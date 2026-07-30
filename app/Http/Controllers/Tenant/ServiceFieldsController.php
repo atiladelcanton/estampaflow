@@ -209,6 +209,47 @@ final class ServiceFieldsController
                 true,
                 true,
             ),
+            'ink_system' => $this->selectPreset(
+                'ink_system',
+                'Sistema de tinta',
+                'Base água, plastisol ou outro sistema',
+                ['Base água', 'Plastisol', 'Discharge/corrosão', 'Silicone', 'Híbrida/alto sólido', 'Outro'],
+                true,
+                true,
+            ),
+            'print_effect' => $this->selectPreset(
+                'print_effect',
+                'Efeito ou acabamento',
+                'Puff, alto brilho, metalizado e outros',
+                [
+                    'Sem efeito',
+                    'Puff/relevo',
+                    'Alta densidade/3D',
+                    'Camurça/suede',
+                    'Gel/alto brilho',
+                    'Metalizado',
+                    'Perolado/shimmer',
+                    'Glitter',
+                    'Refletivo',
+                    'Fosforescente/brilha no escuro',
+                    'Fluorescente/neon',
+                    'Craquelado/vintage',
+                    'Foil',
+                    'Outro',
+                ],
+                true,
+                true,
+                'Sem efeito',
+            ),
+            'white_base' => $this->selectPreset(
+                'white_base',
+                'Base branca',
+                'Definida automaticamente ou manualmente',
+                ['Automático', 'Sim', 'Não'],
+                false,
+                true,
+                'Automático',
+            ),
             'material' => $this->preset(
                 'material',
                 'Material ou tecido',
@@ -218,18 +259,9 @@ final class ServiceFieldsController
                 false,
                 false,
             ),
-            'finishing' => $this->preset(
-                'finishing',
-                'Acabamento',
-                'Detalhes extras do serviço',
-                ServiceParameterFieldType::TEXT,
-                null,
-                false,
-                false,
-            ),
-            'notes' => $this->preset(
-                'notes',
-                'Observações do serviço',
+            'technical_notes' => $this->preset(
+                'technical_notes',
+                'Observação técnica',
                 'Informações livres para a equipe',
                 ServiceParameterFieldType::TEXT,
                 null,
@@ -274,6 +306,7 @@ final class ServiceFieldsController
         array $options,
         bool $required,
         bool $affectsPricing,
+        ?string $defaultValue = null,
     ): array {
         $field = $this->preset(
             $key,
@@ -285,6 +318,7 @@ final class ServiceFieldsController
             $affectsPricing,
         );
         $field['options_text'] = implode("\n", $options);
+        $field['default_value'] = $defaultValue ?? '';
 
         return $field;
     }

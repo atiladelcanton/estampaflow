@@ -60,3 +60,6 @@ provision-domains:
 reset:
 	docker compose down -v
 	rm -rf vendor node_modules public/build .env
+
+build:
+	docker compose run --rm node npm run build

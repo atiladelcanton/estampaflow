@@ -68,3 +68,12 @@ Pertence a uma versão. Suporta TEXT, INTEGER, DECIMAL, BOOLEAN, SELECT e MULTIS
 A UI não expõe schema, draft, publicação ou número de versão. O Owner vê somente os campos usados pelo serviço, sugestões prontas e o botão **Salvar alterações**. A `UpdateServiceFieldsAction` cria a nova versão, salva e ativa nos bastidores, preservando o histórico necessário para orçamentos antigos.
 
 Campos personalizados recebem identificador interno automaticamente a partir do nome exibido. Opções menos usadas, como unidade, valor inicial e impacto na precificação, ficam recolhidas em **Mais opções**.
+
+
+## Campos padrão do Silk Screen
+
+O Silk Screen vem pronto com os campos que alteram custo e execução: quantidade de cores, sistema de tinta, efeito ou acabamento, largura, altura e base branca. A observação técnica não participa do preço.
+
+A posição da estampa não é um campo genérico do serviço. Frente, costas, peito e mangas serão aplicações independentes no orçamento, permitindo configurações e preços diferentes por local.
+
+Os tenants existentes recebem apenas os campos ausentes por uma migration de backfill. Campos personalizados e configurações já existentes são preservados.

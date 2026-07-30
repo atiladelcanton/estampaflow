@@ -47,6 +47,29 @@ it('cria os quatro serviços padrão de forma idempotente', function (): void {
             'BORDADO',
         ]);
 
+        $silk = ServiceType::query()->where('code', 'SILK')->firstOrFail();
+        $silkParameters = $silk->activeSchemaVersion()
+            ->firstOrFail()
+            ->parameters()
+            ->get()
+            ->keyBy('key');
+
+        expect($silkParameters->keys()->all())->toBe([
+            'screen_colors',
+            'ink_system',
+            'print_effect',
+            'width_cm',
+            'height_cm',
+            'white_base',
+            'technical_notes',
+        ])
+            ->and($silkParameters->get('ink_system')?->required)->toBeTrue()
+            ->and($silkParameters->get('ink_system')?->affects_pricing)->toBeTrue()
+            ->and($silkParameters->get('print_effect')?->default_value)->toBe('Sem efeito')
+            ->and($silkParameters->get('white_base')?->options)->toBe(['Automático', 'Sim', 'Não'])
+            ->and($silkParameters->get('white_base')?->default_value)->toBe('Automático')
+            ->and($silkParameters->get('technical_notes')?->affects_pricing)->toBeFalse();
+
         $dtf = ServiceType::query()->where('code', 'DTF')->firstOrFail();
         $dtf->forceFill([
             'name' => 'DTF personalizado',

@@ -234,9 +234,11 @@ final class ServiceSchemaEditor extends Component
             'height_cm' => $this->preset('height_cm', 'Altura', ServiceParameterFieldType::DECIMAL, 'cm', true, true),
             'print_size' => $this->selectPreset('print_size', 'Tamanho da estampa', ['A6', 'A5', 'A4', 'A3', 'Personalizado'], true, true),
             'screen_colors' => $this->preset('screen_colors', 'Quantidade de cores', ServiceParameterFieldType::INTEGER, 'cores', true, true),
+            'ink_system' => $this->selectPreset('ink_system', 'Sistema de tinta', ['Base água', 'Plastisol', 'Discharge/corrosão', 'Silicone', 'Híbrida/alto sólido', 'Outro'], true, true),
+            'print_effect' => $this->selectPreset('print_effect', 'Efeito ou acabamento', ['Sem efeito', 'Puff/relevo', 'Alta densidade/3D', 'Camurça/suede', 'Gel/alto brilho', 'Metalizado', 'Perolado/shimmer', 'Glitter', 'Refletivo', 'Fosforescente/brilha no escuro', 'Fluorescente/neon', 'Craquelado/vintage', 'Foil', 'Outro'], true, true, 'Sem efeito'),
+            'white_base' => $this->selectPreset('white_base', 'Base branca', ['Automático', 'Sim', 'Não'], false, true, 'Automático'),
             'material' => $this->preset('material', 'Material ou tecido', ServiceParameterFieldType::TEXT, null, false, false),
-            'finishing' => $this->preset('finishing', 'Acabamento', ServiceParameterFieldType::TEXT, null, false, false),
-            'notes' => $this->preset('notes', 'Observações do serviço', ServiceParameterFieldType::TEXT, null, false, false),
+            'technical_notes' => $this->preset('technical_notes', 'Observação técnica', ServiceParameterFieldType::TEXT, null, false, false),
         ];
     }
 
@@ -272,9 +274,11 @@ final class ServiceSchemaEditor extends Component
         array $options,
         bool $required,
         bool $affectsPricing,
+        ?string $defaultValue = null,
     ): array {
         $field = $this->preset($key, $label, ServiceParameterFieldType::SELECT, null, $required, $affectsPricing);
         $field['options_text'] = implode("\n", $options);
+        $field['default_value'] = $defaultValue;
 
         return $field;
     }
