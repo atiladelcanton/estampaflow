@@ -101,11 +101,40 @@
                     </a>
                 @endif
 
+                @if($currentMembership?->isOwner())
+                    <a
+                        href="{{ route('tenant.pricing.index') }}"
+                        @class(['nav-item', 'nav-item-active' => request()->routeIs('tenant.pricing.*')])
+                        aria-label="Precificação"
+                        @mouseenter="showSidebarTooltip('Precificação', $el)"
+                        @mouseleave="hideSidebarTooltip()"
+                        @focus="showSidebarTooltip('Precificação', $el)"
+                        @blur="hideSidebarTooltip()"
+                    >
+                        <x-icon name="calculator" />
+                        <span x-show="! sidebarCollapsed">Precificação</span>
+                        <span x-show="! sidebarCollapsed" class="nav-pill">Sprint 3</span>
+                    </a>
+                @endif
+
+                <a
+                    href="{{ route('tenant.help.index') }}"
+                    @class(['nav-item', 'nav-item-active' => request()->routeIs('tenant.help.*')])
+                    aria-label="Ajuda e tutoriais"
+                    data-tour="help-menu"
+                    @mouseenter="showSidebarTooltip('Ajuda e tutoriais', $el)"
+                    @mouseleave="hideSidebarTooltip()"
+                    @focus="showSidebarTooltip('Ajuda e tutoriais', $el)"
+                    @blur="hideSidebarTooltip()"
+                >
+                    <x-icon name="file" />
+                    <span x-show="! sidebarCollapsed">Ajuda e tutoriais</span>
+                </a>
+
                 @foreach ([
                     ['users', 'Clientes', 'Sprint 5'],
                     ['shirt', 'Produtos', 'Sprint 4'],
                     ['box', 'Estoque', 'Sprint 4'],
-                    ['calculator', 'Precificação', 'Sprint 3'],
                     ['file', 'Orçamentos', 'Sprint 5'],
                     ['factory', 'Produção', 'Sprint 7'],
                     ['palette', 'Artes', 'Sprint 7'],
@@ -214,6 +243,11 @@
                 @if(! $currentTenant)
                     <a href="{{ route('ui.style-guide') }}" class="hidden rounded-xl px-3 py-2 text-xs font-semibold text-ink-500 transition hover:bg-app hover:text-ink-950 sm:block">Documentação</a>
                 @endif
+                @if(is_array($currentTutorial))
+                    <button type="button" class="hidden rounded-xl px-3 py-2 text-xs font-bold text-brand-700 transition hover:bg-brand-50 sm:inline-flex" @click="$dispatch('start-page-tutorial')">
+                        Tutorial desta página
+                    </button>
+                @endif
                 <button class="icon-button" aria-label="Notificações"><x-icon name="bell" class="size-[18px]" /><span class="absolute right-2 top-2 size-1.5 rounded-full bg-brand-500 ring-2 ring-white"></span></button>
                 <div class="ml-1 flex items-center gap-2 rounded-2xl border border-line bg-white p-1.5 pr-3 shadow-soft">
                     <div class="grid size-8 place-items-center rounded-xl bg-brand-100 text-xs font-extrabold text-brand-700">{{ str(auth()->user()->name)->substr(0, 2)->upper() }}</div>
@@ -226,9 +260,20 @@
         </header>
 
         <main class="min-w-0">
+            @if($currentTenant && $currentMembership?->isOwner() && $onboardingWizardPending && ! request()->routeIs('tenant.onboarding.*'))
+                <div class="mx-4 mt-4 flex flex-col gap-3 rounded-2xl border border-brand-200 bg-brand-50 px-5 py-4 sm:mx-6 sm:flex-row sm:items-center sm:justify-between lg:mx-8">
+                    <div>
+                        <p class="text-sm font-extrabold text-brand-800">Termine a configuração inicial</p>
+                        <p class="mt-1 text-xs text-brand-700/80">Leva poucos minutos e pode ser retomada depois.</p>
+                    </div>
+                    <a href="{{ route('tenant.onboarding.show') }}" class="button-primary shrink-0 !px-3 !py-2 text-xs">Continuar primeiros passos</a>
+                </div>
+            @endif
             {{ $slot }}
         </main>
     </div>
+
+    <x-onboarding.page-tutorial :tutorial="$currentTutorial" :acknowledged="$currentTutorialAcknowledged" />
 
     @livewireScripts
 </body>

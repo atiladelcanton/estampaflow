@@ -46,7 +46,7 @@ final class CreateNewUser implements CreatesNewUsers
             password: $input['password'],
         ));
 
-        session()->put('registration.tenant_url', $this->urls->for($registration->tenant));
+        session()->put('registration.tenant_url', $this->urls->for($registration->tenant, '/primeiros-passos'));
 
         return $registration->user;
     }

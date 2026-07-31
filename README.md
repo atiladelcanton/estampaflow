@@ -1,4 +1,4 @@
-# EstampaFlow — Sprint 2
+# EstampaFlow — Sprint 2.5
 
 SaaS multi-tenant para gestão de estamparias, com Laravel 13, Livewire 4, Tailwind 4, Fortify, MySQL 8.4 e `stancl/tenancy`.
 
@@ -77,7 +77,7 @@ make shell
 - `docs/sprints/sprint-01-implementation-report.md`;
 - `docs/domains/tenancy/README.md`;
 - `docs/ui/style-guide.md`;
-- `delka-estamparia-contexto-v2.3.md`.
+- `delka-estamparia-contexto-v2.8.md`.
 
 
 ## Novos subdomínios no ambiente local
@@ -139,3 +139,20 @@ Após aplicar a atualização, acesse no domínio do tenant:
 ```
 
 O Owner poderá configurar serviços, parâmetros e versões de schema. O motor de preços será implementado na Sprint 3.
+
+
+## Sprint 2.5 — Onboarding e ajuda
+
+No primeiro login, o Owner é direcionado para:
+
+```text
+/primeiros-passos
+```
+
+A Central de Ajuda fica disponível em:
+
+```text
+/ajuda
+```
+
+Os tutoriais contextuais aparecem apenas na primeira visita e podem ser revistos pelo botão **Tutorial desta página**.

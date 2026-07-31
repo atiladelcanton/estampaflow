@@ -18,7 +18,7 @@ it('creates the owner and tenant during public registration', function (): void 
     $user = User::query()->where('email', 'maria@horizonte.test')->firstOrFail();
     $tenant = Tenant::query()->where('slug', 'estamparia-horizonte')->firstOrFail();
 
-    $response->assertRedirect('http://estamparia-horizonte.estamparia.test/dashboard');
+    $response->assertRedirect('http://estamparia-horizonte.estamparia.test/primeiros-passos');
     expect($user->memberships()->where('tenant_id', $tenant->getTenantKey())->firstOrFail()->role)
         ->toBe(TenantRole::OWNER);
 });

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Domains\Onboarding\Models\UserOnboardingProgress;
 use App\Domains\Tenancy\Enums\MembershipStatus;
 use App\Domains\Tenancy\Models\Tenant;
 use App\Domains\Tenancy\Models\TenantMembership;
@@ -67,6 +68,14 @@ final class User extends Authenticatable
         return $this->belongsToMany(Tenant::class, 'tenant_memberships')
             ->withPivot(['id', 'role', 'status', 'joined_at'])
             ->withTimestamps();
+    }
+
+    /**
+     * @return HasMany<UserOnboardingProgress, $this>
+     */
+    public function onboardingProgress(): HasMany
+    {
+        return $this->hasMany(UserOnboardingProgress::class);
     }
 
     public function activeMembershipFor(string $tenantId): ?TenantMembership

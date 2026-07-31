@@ -75,13 +75,15 @@ O sistema oferece chaves implementadas e versionadas:
 - `QUANTITY_TIER`;
 - `AREA`;
 - `MATRIX`;
-- `STITCH_RANGE`.
+- `STITCH_RANGE`;
+- `ROLL_LENGTH`.
 
 Nenhuma estratégia depende do código DTF, Silk, Sublimação ou Bordado.
 
 Defaults sugeridos:
 
-- DTF: `AREA` ou `MATRIX`;
+- DTF comprado: `ROLL_LENGTH`;
+- DTF produzido internamente: custo por metro derivado de insumos, planejado para a Sprint 4;
 - Silk: `MATRIX`;
 - Sublimação: `AREA` ou `MATRIX`;
 - Bordado: `STITCH_RANGE`.
@@ -169,3 +171,16 @@ Registrar autor, antes/depois, vigência, versão e impacto estimado.
 ## Histórico
 
 - 18/07/2026 — decisão aceita com tabelas reais de versão, estratégias conhecidas e separação Money/Rate.
+
+
+## Interface guiada e estratégias operacionais
+
+A linguagem do motor não deve ser apresentada diretamente ao Owner.
+
+- DTF comprado utiliza a estratégia conhecida `ROLL_LENGTH`, com custo por metro, largura útil, encaixe retangular e arredondamento para metros inteiros.
+- Silk utiliza `MATRIX` com uma interface própria por quantidade e número de cores. Preparação, base branca, tintas e efeitos são convertidos em settings e regras declarativas.
+- Interfaces especializadas podem ser resolvidas pelo código dos serviços padrão, mas o motor permanece baseado em estratégias genéricas e o fallback para serviços customizados continua disponível.
+- O formulário principal não pede taxa por cm², prioridade, especificidade, JSON ou versão de schema.
+- Toda configuração guiada apresenta prévia antes de salvar e mantém a versão anterior.
+
+Essas decisões não autorizam condicionais por técnica dentro de Quote ou Production. A especialização pertence à camada de configuração e apresentação da precificação.

@@ -2,11 +2,14 @@
 
 namespace App\Providers;
 
+use App\Domains\Onboarding\Services\OnboardingProgressService;
+use App\Domains\Onboarding\Services\OnboardingRegistry;
 use App\Domains\Tenancy\Models\Tenant;
 use App\Domains\Tenancy\Services\TenantMembershipService;
 use App\Http\Middleware\EnsureActiveTenantMembership;
 use App\Http\Middleware\EnsureTenantOwner;
 use App\Http\Middleware\InitializeTenancyForRequest;
+use App\Models\User;
 use App\Support\Audit\AuditLogger;
 use App\Support\Auth\AuthenticatedDestinationResolver;
 use App\Support\Correlation\CorrelationContext;
@@ -28,6 +31,8 @@ final class AppServiceProvider extends ServiceProvider
         $this->app->scoped(TenantMembershipService::class);
         $this->app->scoped(TenantUrlGenerator::class);
         $this->app->scoped(AuditLogger::class);
+        $this->app->scoped(OnboardingProgressService::class);
+        $this->app->singleton(OnboardingRegistry::class);
         $this->app->scoped(AuthenticatedDestinationResolver::class);
     }
 
@@ -74,9 +79,45 @@ final class AppServiceProvider extends ServiceProvider
                 }
             }
 
+            $currentTutorial = null;
+            $currentTutorialAcknowledged = true;
+            $onboardingWizardPending = false;
+
+            $user = auth()->user();
+
+            if ($currentTenant !== null && $currentMembership !== null && $user instanceof User) {
+                $registry = app(OnboardingRegistry::class);
+                $progress = app(OnboardingProgressService::class);
+                $tenantId = (string) $currentTenant->getTenantKey();
+                $routeName = request()->route()?->getName();
+                $currentTutorial = $registry->tutorialForRoute($routeName, $currentMembership->role);
+
+                if (is_array($currentTutorial)) {
+                    $currentTutorialAcknowledged = $progress->isAcknowledged(
+                        $user,
+                        $tenantId,
+                        (string) ($currentTutorial['key'] ?? ''),
+                        (int) ($currentTutorial['version'] ?? 1),
+                    );
+                }
+
+                if ($currentMembership->isOwner()) {
+                    $wizard = $registry->wizard();
+                    $onboardingWizardPending = ! $progress->isAcknowledged(
+                        $user,
+                        $tenantId,
+                        (string) ($wizard['key'] ?? 'owner-first-steps'),
+                        (int) ($wizard['version'] ?? 1),
+                    );
+                }
+            }
+
             $view->with([
                 'currentTenant' => $currentTenant,
                 'currentMembership' => $currentMembership,
+                'currentTutorial' => $currentTutorial,
+                'currentTutorialAcknowledged' => $currentTutorialAcknowledged,
+                'onboardingWizardPending' => $onboardingWizardPending,
             ]);
         });
     }

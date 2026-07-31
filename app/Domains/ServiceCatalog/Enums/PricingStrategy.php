@@ -11,6 +11,7 @@ enum PricingStrategy: string
     case AREA = 'AREA';
     case MATRIX = 'MATRIX';
     case STITCH_RANGE = 'STITCH_RANGE';
+    case ROLL_LENGTH = 'ROLL_LENGTH';
 
     public function label(): string
     {
@@ -20,6 +21,7 @@ enum PricingStrategy: string
             self::AREA => 'Área',
             self::MATRIX => 'Matriz de parâmetros',
             self::STITCH_RANGE => 'Faixa de pontos',
+            self::ROLL_LENGTH => 'Material por metro inteiro',
         };
     }
 }

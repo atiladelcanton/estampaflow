@@ -60,7 +60,7 @@ final readonly class DefaultServiceCatalogService
                 'code' => 'DTF',
                 'name' => 'DTF',
                 'description' => 'Impressão e aplicação de transfer DTF.',
-                'strategy' => PricingStrategy::AREA,
+                'strategy' => PricingStrategy::ROLL_LENGTH,
                 'order' => 10,
                 'parameters' => [
                     $this->parameter('width_cm', 'Largura', ServiceParameterFieldType::DECIMAL, 'cm', true, true, 10),

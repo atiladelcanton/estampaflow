@@ -49,7 +49,7 @@ it('autentica o Owner e redireciona diretamente para o tenant', function (): voi
     ]);
 
     $this->assertAuthenticatedAs($owner);
-    $response->assertRedirect('http://estamparia-login.estamparia.test/dashboard');
+    $response->assertRedirect('http://estamparia-login.estamparia.test/primeiros-passos');
 });
 
 it('permite encerrar a sessão', function (): void {

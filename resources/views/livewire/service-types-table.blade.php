@@ -5,7 +5,7 @@
             <h1 class="page-title">Tipos de serviço</h1>
             <p class="page-description">Configure DTF, Silk, Sublimação, Bordado e qualquer outro serviço sem alterar o código do sistema.</p>
         </div>
-        <a href="{{ route('tenant.service-types.create') }}" class="button-primary"><x-icon name="plus" class="size-4" /> Novo serviço</a>
+        <a href="{{ route('tenant.service-types.create') }}" class="button-primary" data-tour="service-create"><x-icon name="plus" class="size-4" /> Novo serviço</a>
     </div>
 
     @if (session('success'))
@@ -34,7 +34,7 @@
         </div>
     </div>
 
-    <div class="table-shell mt-6">
+    <div class="table-shell mt-6" data-tour="service-table">
         <div class="overflow-x-auto">
             <table class="data-table min-w-[1180px]">
                 <thead>
@@ -91,7 +91,8 @@
                             </td>
                             <td>
                                 <div class="flex items-center justify-end gap-1 whitespace-nowrap">
-                                    <a href="{{ route('tenant.service-types.fields', ['serviceType' => $serviceType->id]) }}" class="button-primary !px-3 !py-2" title="Definir os campos solicitados ao usar este serviço" data-testid="service-fields-link">Campos</a>
+                                    <a href="{{ route('tenant.pricing.edit', ['serviceType' => $serviceType->id]) }}" class="button-primary !px-3 !py-2" title="Configurar os preços deste serviço">Preços</a>
+                                    <a href="{{ route('tenant.service-types.fields', ['serviceType' => $serviceType->id]) }}" class="button-secondary !px-3 !py-2" title="Definir os campos solicitados ao usar este serviço" data-testid="service-fields-link" data-tour="service-fields-link">Campos</a>
                                     <a href="{{ route('tenant.service-types.edit', ['serviceType' => $serviceType->id]) }}" class="button-secondary !px-3 !py-2">Editar</a>
                                     <button type="button" wire:click="duplicate('{{ $serviceType->id }}')" wire:loading.attr="disabled" class="button-ghost !px-2.5 !py-2">Duplicar</button>
                                     <button type="button" wire:click="toggle('{{ $serviceType->id }}')" wire:loading.attr="disabled" class="button-ghost !px-2.5 !py-2">{{ $serviceType->active ? 'Desativar' : 'Ativar' }}</button>

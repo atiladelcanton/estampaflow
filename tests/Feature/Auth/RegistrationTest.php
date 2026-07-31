@@ -34,7 +34,7 @@ it('cadastra Owner e estamparia e redireciona diretamente para o tenant', functi
         ->firstOrFail();
 
     $this->assertAuthenticatedAs($user);
-    $response->assertRedirect('http://estamparia-horizonte.estamparia.test/dashboard');
+    $response->assertRedirect('http://estamparia-horizonte.estamparia.test/primeiros-passos');
 
     $this->assertDatabaseHas('domains', [
         'tenant_id' => $tenant->getTenantKey(),

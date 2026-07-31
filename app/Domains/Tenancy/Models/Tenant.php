@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domains\Tenancy\Models;
 
+use App\Domains\Onboarding\Models\UserOnboardingProgress;
 use App\Domains\ServiceCatalog\Models\ServiceType;
 use App\Domains\Tenancy\Enums\TenantStatus;
 use App\Models\User;
@@ -81,6 +82,14 @@ final class Tenant extends BaseTenant
     public function domains(): HasMany
     {
         return $this->hasMany(Domain::class, 'tenant_id');
+    }
+
+    /**
+     * @return HasMany<UserOnboardingProgress, $this>
+     */
+    public function onboardingProgress(): HasMany
+    {
+        return $this->hasMany(UserOnboardingProgress::class);
     }
 
     /**

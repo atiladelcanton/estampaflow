@@ -21,3 +21,7 @@ Cada sprint deve registrar objetivo, escopo, fora do escopo, estado inicial, ADR
 - Sprint 0: concluída.
 - Sprint 1: concluída.
 - Sprint 2 — Catálogo dinâmico: pronta para validação.
+
+- `sprint-02-5-onboarding-help.md` — onboarding, tutoriais contextuais e Central de Ajuda.
+
+- [Sprint 3 — Motor de Precificação](sprint-03-pricing-engine.md)

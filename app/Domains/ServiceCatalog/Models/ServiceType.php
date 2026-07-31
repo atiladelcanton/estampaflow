@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domains\ServiceCatalog\Models;
 
+use App\Domains\Pricing\Models\ServicePriceTable;
 use App\Domains\ServiceCatalog\Enums\PricingMode;
 use App\Domains\ServiceCatalog\Enums\PricingStrategy;
 use App\Support\Tenancy\BelongsToTenant;
@@ -28,6 +29,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property bool $is_default
  * @property int $sort_order
  * @property string|null $active_schema_version_id
+ * @property string|null $active_price_table_id
+ * @property-read ServicePriceTable|null $activePriceTable
  */
 final class ServiceType extends Model
 {
@@ -48,6 +51,7 @@ final class ServiceType extends Model
         'is_default',
         'sort_order',
         'active_schema_version_id',
+        'active_price_table_id',
     ];
 
     /** @return array<string, string> */
@@ -74,6 +78,18 @@ final class ServiceType extends Model
     public function activeSchemaVersion(): BelongsTo
     {
         return $this->belongsTo(ServiceTypeSchemaVersion::class, 'active_schema_version_id');
+    }
+
+    /** @return HasMany<ServicePriceTable, $this> */
+    public function priceTables(): HasMany
+    {
+        return $this->hasMany(ServicePriceTable::class)->orderByDesc('version');
+    }
+
+    /** @return BelongsTo<ServicePriceTable, $this> */
+    public function activePriceTable(): BelongsTo
+    {
+        return $this->belongsTo(ServicePriceTable::class, 'active_price_table_id');
     }
 
     /** @param Builder<ServiceType> $query */

@@ -14,11 +14,11 @@
 
         @if($currentMembership?->isOwner())
             <div class="flex flex-wrap gap-3">
-                <a href="{{ route('tenant.service-types.index') }}" class="button-primary">
+                <a href="{{ route('tenant.service-types.index') }}" class="button-primary" data-tour="dashboard-services">
                     <x-icon name="layers" class="size-4" />
                     Tipos de serviço
                 </a>
-                <a href="{{ route('tenant.users') }}" class="button-secondary">
+                <a href="{{ route('tenant.users') }}" class="button-secondary" data-tour="dashboard-team">
                     <x-icon name="users" class="size-4" />
                     Gerenciar equipe
                 </a>
@@ -26,7 +26,7 @@
         @endif
     </div>
 
-    <section class="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <section class="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4" data-tour="dashboard-summary">
         <div class="metric-card">
             <span class="metric-label">Usuários ativos</span>
             <p class="metric-value">{{ $membersCount }}</p>

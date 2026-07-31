@@ -59,7 +59,7 @@
             @csrf
             @method('PATCH')
 
-            <section class="surface-card p-5 sm:p-6" data-testid="suggested-fields">
+            <section class="surface-card p-5 sm:p-6" data-testid="suggested-fields" data-tour="service-field-suggestions">
                 <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
                     <div>
                         <h2 class="text-sm font-extrabold text-ink-950">Adicionar campos comuns</h2>
@@ -89,7 +89,7 @@
                 </div>
             </section>
 
-            <section class="surface-card mt-6 overflow-hidden">
+            <section class="surface-card mt-6 overflow-hidden" data-tour="service-fields-current">
                 <div class="surface-card-header gap-4">
                     <div>
                         <h2 class="text-sm font-extrabold">Campos usados neste serviço</h2>
@@ -209,7 +209,7 @@
 
                 <div class="flex flex-col gap-3 border-t border-line bg-white px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
                     <p class="text-[11px] leading-5 text-ink-400">As alterações anteriores continuam preservadas para não modificar orçamentos antigos.</p>
-                    <button type="submit" class="button-primary">Salvar alterações</button>
+                    <button type="submit" class="button-primary" data-tour="service-fields-save">Salvar alterações</button>
                 </div>
             </section>
         </form>

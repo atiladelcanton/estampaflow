@@ -27,7 +27,7 @@
     @endif
 
     <section class="mt-8 grid gap-6 xl:grid-cols-[.7fr_1.3fr]">
-        <div class="surface-card p-5">
+        <div class="surface-card p-5" data-tour="team-invite">
             <h2 class="text-sm font-extrabold">Convidar usuário</h2>
             <p class="mt-1 text-xs text-ink-400">O convite expira em 7 dias.</p>
 
@@ -65,7 +65,7 @@
             </div>
         </div>
 
-        <div class="table-shell overflow-x-auto">
+        <div class="table-shell overflow-x-auto" data-tour="team-members">
             <table class="data-table">
                 <thead>
                     <tr>

@@ -1,23 +1,30 @@
-# Patch — Campos do serviço sem Livewire
+# Patch — Precificação guiada dos quatro serviços padrão
 
-## Correções
+## Objetivo
 
-- remove o 404 ao adicionar sugestões ou campos personalizados;
-- elimina requisições Livewire desta tela;
-- adiciona campos instantaneamente no navegador com Alpine.js;
-- envia dados apenas ao salvar;
-- substitui chips apertados por cartões uniformes em grade;
-- mantém `/schema` compatível;
-- adiciona teste HTTP real de salvamento no domínio do tenant;
-- mantém bloqueio de usuários comuns.
+Substituir a tela técnica da Sprint 3 por fluxos operacionais curtos para:
+
+- DTF;
+- Silk Screen;
+- Sublimação;
+- Bordado.
+
+O motor genérico, versionado e tenant-aware permanece nos bastidores. Serviços personalizados continuam usando o editor avançado como fallback.
 
 ## Aplicação
 
 ```bash
-unzip -o estampaflow-sprint-2-fields-form-fix.zip -d .
-chmod +x scripts/validate-sprint-2-fields-form.sh
-./scripts/validate-sprint-2-fields-form.sh
+unzip -o estampaflow-sprint-3-guided-all-services-update.zip -d .
+chmod +x scripts/validate-sprint-3-guided-pricing.sh
+./scripts/validate-sprint-3-guided-pricing.sh
+```
+
+Depois execute:
+
+```bash
 make quality
 ```
 
-Não há migration nem alteração destrutiva de dados.
+## Banco
+
+Não há migration. Configurações antigas continuam preservadas e são aposentadas somente quando uma nova versão é salva.

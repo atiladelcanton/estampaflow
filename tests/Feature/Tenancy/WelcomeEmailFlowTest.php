@@ -26,7 +26,7 @@ it('queues a welcome email after public tenant registration', function (): void 
         'email' => 'maria.boasvindas@example.com',
         'password' => 'password',
         'password_confirmation' => 'password',
-    ])->assertRedirect('http://estamparia-boas-vindas.estamparia.test/dashboard');
+    ])->assertRedirect('http://estamparia-boas-vindas.estamparia.test/primeiros-passos');
 
     $user = User::query()->where('email', 'maria.boasvindas@example.com')->firstOrFail();
     $tenant = Tenant::query()->where('slug', 'estamparia-boas-vindas')->firstOrFail();
