@@ -73,13 +73,15 @@ final readonly class ServicePricingController
                 ? $this->guidedData->parameterOptions($service)
                 : [],
             'legacyConfiguration' => $this->isLegacyConfiguration($table, $template),
-            'strategies' => array_values(array_filter(
+            'strategies' => array_filter(
                 PricingStrategy::cases(),
                 static fn (PricingStrategy $strategy): bool => $strategy !== PricingStrategy::ROLL_LENGTH,
-            )),
+            ),
             'pricingParameters' => $this->pricingParameters($service),
             'initialRules' => $this->ruleRows($table),
-            'initialSettings' => $table?->settings ?? $this->defaultSettings($service),
+            'initialSettings' => $table instanceof ServicePriceTable
+                ? ($table->settings ?? $this->defaultSettings($service))
+                : $this->defaultSettings($service),
         ]);
     }
 
@@ -252,6 +254,8 @@ final readonly class ServicePricingController
         $categoryKeys = array_column($this->additionalGuidedData->sublimationCategories(), 'key');
 
         return $request->validate([
+            'selected_categories' => ['required', 'array', 'min:1', 'max:20'],
+            'selected_categories.*' => ['required', 'string', 'distinct', Rule::in($categoryKeys)],
             'ranges' => ['required', 'array', 'min:1', 'max:30'],
             'ranges.*.min_quantity' => ['required', 'integer', 'min:1', 'max:1000000'],
             'ranges.*.max_quantity' => ['nullable', 'integer', 'min:1', 'max:1000000'],
@@ -261,6 +265,8 @@ final readonly class ServicePricingController
             'valid_from' => ['nullable', 'date'],
             'valid_until' => ['nullable', 'date', 'after_or_equal:valid_from'],
         ], [
+            'selected_categories.required' => 'Escolha pelo menos um tipo de sublimação.',
+            'selected_categories.min' => 'Escolha pelo menos um tipo de sublimação.',
             'ranges.*.prices.*.required' => 'Preencha todos os preços visíveis.',
             'ranges.*.prices.*.regex' => 'Use valores com no máximo duas casas decimais, como 12,50.',
         ]);
@@ -270,6 +276,7 @@ final readonly class ServicePricingController
     private function validateEmbroidery(Request $request): array
     {
         return $request->validate([
+            'digitizing_charge_mode' => ['required', 'string', Rule::in(['INCLUDED', 'SEPARATE'])],
             'stitch_columns' => ['required', 'array', 'min:1', 'max:20'],
             'stitch_columns.*.key' => ['required', 'string', 'max:40', 'distinct'],
             'stitch_columns.*.label' => ['required', 'string', 'max:100', 'distinct'],
@@ -282,6 +289,9 @@ final readonly class ServicePricingController
             'valid_from' => ['nullable', 'date'],
             'valid_until' => ['nullable', 'date', 'after_or_equal:valid_from'],
         ], [
+            'digitizing_charge_mode.required' => 'Escolha como você cobra a criação da matriz.',
+            'stitch_columns.required' => 'Escolha pelo menos uma faixa de pontos.',
+            'stitch_columns.min' => 'Escolha pelo menos uma faixa de pontos.',
             'ranges.*.prices.*.required' => 'Preencha todos os preços visíveis.',
             'ranges.*.prices.*.regex' => 'Use valores com no máximo duas casas decimais, como 12,50.',
         ]);
@@ -334,12 +344,15 @@ final readonly class ServicePricingController
         ]);
     }
 
-    /** @param list<array<string, mixed>> $rows @return list<SavePriceRuleData> */
+    /**
+     * @param  list<array<string, mixed>>  $rows
+     * @return list<SavePriceRuleData>
+     */
     private function toRuleData(array $rows): array
     {
         $rules = [];
 
-        foreach (array_values($rows) as $index => $row) {
+        foreach ($rows as $index => $row) {
             try {
                 $unitAmount = trim((string) ($row['unit_price'] ?? '')) !== ''
                     ? $this->moneyParser->majorToMinor((string) $row['unit_price'])
@@ -383,7 +396,10 @@ final readonly class ServicePricingController
         return $rows;
     }
 
-    /** @param list<array<string, mixed>> $rows @return list<array{parameter: string, operator: string, value: mixed}> */
+    /**
+     * @param  list<array<string, mixed>>  $rows
+     * @return list<array{parameter: string, operator: string, value: mixed}>
+     */
     private function conditions(array $rows): array
     {
         $conditions = [];
@@ -399,7 +415,7 @@ final readonly class ServicePricingController
 
             $value = match ($operator) {
                 'in', 'contains_all' => array_values(array_filter(array_map('trim', explode(',', $raw)))),
-                'between' => array_values(array_map('trim', explode('|', $raw, 2))),
+                'between' => array_map('trim', explode('|', $raw, 2)),
                 default => $raw,
             };
 
@@ -483,7 +499,10 @@ final readonly class ServicePricingController
         ];
     }
 
-    /** @param array<string, mixed> $validated @return array<string, mixed> */
+    /**
+     * @param  array<string, mixed>  $validated
+     * @return array<string, mixed>
+     */
     private function settings(array $validated): array
     {
         return array_filter([

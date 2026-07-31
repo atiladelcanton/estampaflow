@@ -190,13 +190,12 @@ it('salva a tabela guiada da Sublimação por quantidade e tipo', function (): v
 
     $this->actingAs($owner)
         ->put($baseUrl.'/configuracoes/servicos/'.$serviceId.'/precos', [
+            'selected_categories' => ['LOCAL_MEDIUM', 'TOTAL'],
             'ranges' => [[
                 'min_quantity' => 1,
                 'max_quantity' => null,
                 'prices' => [
-                    'LOCAL_SMALL' => '10,00',
                     'LOCAL_MEDIUM' => '15,00',
-                    'LOCAL_LARGE' => '20,00',
                     'TOTAL' => '35,00',
                 ],
             ]],
@@ -210,7 +209,8 @@ it('salva a tabela guiada da Sublimação por quantidade e tipo', function (): v
 
         expect($table->strategy)->toBe(PricingStrategy::MATRIX)
             ->and($table->settings['guided_template'] ?? null)->toBe('SUBLIMATION_MATRIX')
-            ->and($table->rules()->count())->toBe(4);
+            ->and($table->settings['configured_categories'] ?? null)->toBe(['LOCAL_MEDIUM', 'TOTAL'])
+            ->and($table->rules()->count())->toBe(2);
 
         $result = app(DynamicPricingService::class)->calculate(new ServicePricingInput(
             tenantId: (string) $tenant->getTenantKey(),
@@ -239,6 +239,7 @@ it('salva a tabela guiada do Bordado por quantidade e faixa de pontos', function
 
     $this->actingAs($owner)
         ->put($baseUrl.'/configuracoes/servicos/'.$serviceId.'/precos', [
+            'digitizing_charge_mode' => 'SEPARATE',
             'stitch_columns' => [
                 ['key' => 'RANGE_0', 'label' => 'Até 5.000'],
                 ['key' => 'RANGE_1', 'label' => '5.001 a 10.000'],
@@ -261,6 +262,7 @@ it('salva a tabela guiada do Bordado por quantidade e faixa de pontos', function
 
         expect($table->strategy)->toBe(PricingStrategy::MATRIX)
             ->and($table->settings['guided_template'] ?? null)->toBe('EMBROIDERY_MATRIX')
+            ->and($table->settings['digitizing_charge_mode'] ?? null)->toBe('SEPARATE')
             ->and($table->settings['digitizing_amount_minor'] ?? null)->toBe(5000)
             ->and($table->rules()->count())->toBe(2);
 
@@ -276,6 +278,34 @@ it('salva a tabela guiada do Bordado por quantidade e faixa de pontos', function
         expect($result->status)->toBe(PricingResultStatus::MATCHED)
             ->and($result->total?->amountMinor)->toBe(17000);
     });
+});
+
+it('apresenta escolhas interativas na primeira etapa de Sublimação e Bordado', function (): void {
+    [$tenant, $owner, $baseUrl] = guidedPricingFixture('guided-options-ui');
+
+    $serviceIds = app(TenantContext::class)->run(
+        new TenantId((string) $tenant->getTenantKey()),
+        fn (): array => ServiceType::query()
+            ->whereIn('code', ['SUBLIMACAO', 'BORDADO'])
+            ->pluck('id', 'code')
+            ->map(static fn (mixed $id): string => (string) $id)
+            ->all(),
+    );
+
+    $this->actingAs($owner)
+        ->get($baseUrl.'/configuracoes/servicos/'.$serviceIds['SUBLIMACAO'].'/precos')
+        ->assertOk()
+        ->assertSee('Quais tipos de sublimação você oferece?')
+        ->assertSee('Clique para marcar ou desmarcar')
+        ->assertSee('data-pricing-option', false);
+
+    $this->actingAs($owner)
+        ->get($baseUrl.'/configuracoes/servicos/'.$serviceIds['BORDADO'].'/precos')
+        ->assertOk()
+        ->assertSee('Quais faixas de pontos você utiliza?')
+        ->assertSee('Como você cobra a matriz/digitalização?')
+        ->assertSee('Já incluo no preço por peça')
+        ->assertSee('Cobro uma vez por pedido');
 });
 
 it('apresenta configuração guiada nos quatro serviços padrão', function (): void {

@@ -85,3 +85,12 @@ Uma configuração criada pelo editor anterior é preservada. A nova interface m
 2. informe a matriz/digitalização quando cobrada separadamente;
 3. teste um pedido;
 4. confirme preço por peça e total.
+
+## Correção de interação — Sublimação e Bordado
+
+A primeira etapa dos assistentes de Sublimação e Bordado passou a usar opções realmente selecionáveis.
+
+- Sublimação permite marcar somente os tipos oferecidos pelo tenant; a tabela exibe apenas essas colunas.
+- Bordado permite marcar as faixas de pontos utilizadas e escolher se a matriz/digitalização está incluída ou é cobrada separadamente.
+- Pelo menos uma opção deve permanecer marcada.
+- As escolhas são persistidas nas configurações versionadas da tabela.

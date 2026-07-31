@@ -114,7 +114,10 @@ final readonly class SaveServicePricingAction
         });
     }
 
-    /** @param list<SavePriceRuleData> $rules @param array<string, mixed> $settings */
+    /**
+     * @param  list<SavePriceRuleData>  $rules
+     * @param  array<string, mixed>  $settings
+     */
     private function validateRules(
         ServiceType $service,
         PricingStrategy $strategy,

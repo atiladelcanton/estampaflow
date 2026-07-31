@@ -163,14 +163,15 @@ final readonly class DynamicPricingService
             return $this->silkMatrixTotal($table, $rule, $input, $parameters);
         }
 
-        $base = match ($table->strategy) {
-            PricingStrategy::UNIT,
-            PricingStrategy::QUANTITY_TIER,
-            PricingStrategy::MATRIX => $this->unitTotal($rule, $input),
-            PricingStrategy::AREA => $this->areaTotal($table, $rule, $input),
-            PricingStrategy::STITCH_RANGE => $this->stitchTotal($table, $rule, $input),
-            PricingStrategy::ROLL_LENGTH => null,
-        };
+        $base = null;
+
+        if (in_array($table->strategy, [PricingStrategy::UNIT, PricingStrategy::QUANTITY_TIER, PricingStrategy::MATRIX], true)) {
+            $base = $this->unitTotal($rule, $input);
+        } elseif ($table->strategy === PricingStrategy::AREA) {
+            $base = $this->areaTotal($table, $rule, $input);
+        } elseif ($table->strategy === PricingStrategy::STITCH_RANGE) {
+            $base = $this->stitchTotal($table, $rule, $input);
+        }
 
         if (! $base instanceof Money) {
             return null;
@@ -245,7 +246,10 @@ final readonly class DynamicPricingService
         );
     }
 
-    /** @param array<string, mixed> $settings @param array<string, mixed> $parameters */
+    /**
+     * @param  array<string, mixed>  $settings
+     * @param  array<string, mixed>  $parameters
+     */
     private function perItemAddons(array $settings, array $parameters): int
     {
         $configured = $settings['per_item_addons'] ?? null;
@@ -271,7 +275,10 @@ final readonly class DynamicPricingService
         return $total;
     }
 
-    /** @param array<string, mixed> $settings @param array<string, mixed> $parameters @return array<string, mixed> */
+    /**
+     * @param  array<string, mixed>  $parameters
+     * @return array<string, mixed>
+     */
     private function parametersForMatching(ServicePriceTable $table, array $parameters): array
     {
         $settings = $table->settings ?? [];

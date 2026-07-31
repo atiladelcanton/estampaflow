@@ -1,30 +1,28 @@
-# Patch — Precificação guiada dos quatro serviços padrão
+# Sprint 3 — Correção das opções de Sublimação e Bordado
 
-## Objetivo
+Este patch é cumulativo: inclui a correção anterior do PHPStan e a correção das opções que pareciam clicáveis, mas eram apenas cartões informativos.
 
-Substituir a tela técnica da Sprint 3 por fluxos operacionais curtos para:
+## Sublimação
 
-- DTF;
-- Silk Screen;
-- Sublimação;
-- Bordado.
+- A primeira etapa agora permite marcar e desmarcar os tipos oferecidos.
+- A tabela exibe somente as categorias escolhidas.
+- Pelo menos uma categoria deve permanecer selecionada.
+- A escolha é persistida na versão da tabela.
 
-O motor genérico, versionado e tenant-aware permanece nos bastidores. Serviços personalizados continuam usando o editor avançado como fallback.
+## Bordado
+
+- A primeira etapa permite escolher as faixas de pontos utilizadas.
+- A tabela exibe somente as faixas escolhidas.
+- O usuário escolhe se a matriz/digitalização está incluída no preço por peça ou é cobrada separadamente.
+- A cobrança separada aparece no teste e é persistida.
 
 ## Aplicação
 
 ```bash
-unzip -o estampaflow-sprint-3-guided-all-services-update.zip -d .
-chmod +x scripts/validate-sprint-3-guided-pricing.sh
-./scripts/validate-sprint-3-guided-pricing.sh
-```
-
-Depois execute:
-
-```bash
+unzip -o estampaflow-sprint-3-guided-options-fix.zip -d .
+chmod +x scripts/validate-sprint-3-guided-options-fix.sh
+./scripts/validate-sprint-3-guided-options-fix.sh
 make quality
 ```
 
-## Banco
-
-Não há migration. Configurações antigas continuam preservadas e são aposentadas somente quando uma nova versão é salva.
+Não há migration e os preços existentes são preservados.

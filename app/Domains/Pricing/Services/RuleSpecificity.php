@@ -36,7 +36,10 @@ final class RuleSpecificity
         return [$eq, $in, $closedRanges, count($conditions), $rangeWidthScore, $rule->priority];
     }
 
-    /** @param array{int, int, int, int, int, int} $left @param array{int, int, int, int, int, int} $right */
+    /**
+     * @param  array{int, int, int, int, int, int}  $left
+     * @param  array{int, int, int, int, int, int}  $right
+     */
     public function compare(array $left, array $right): int
     {
         foreach ($left as $index => $value) {

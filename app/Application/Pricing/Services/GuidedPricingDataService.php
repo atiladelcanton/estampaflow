@@ -298,7 +298,7 @@ final readonly class GuidedPricingDataService
                 continue;
             }
 
-            $result[$parameter->key] = array_values(array_map('strval', $parameter->options));
+            $result[$parameter->key] = array_map('strval', $parameter->options);
         }
 
         return $result;
@@ -316,7 +316,10 @@ final readonly class GuidedPricingDataService
         return $settings;
     }
 
-    /** @param array<string, mixed> $settings @return list<int> */
+    /**
+     * @param  array<string, mixed>  $settings
+     * @return list<int>
+     */
     private function silkColors(?ServicePriceTable $table, array $settings): array
     {
         $configured = $settings['configured_colors'] ?? null;
@@ -338,7 +341,7 @@ final readonly class GuidedPricingDataService
         if ($table instanceof ServicePriceTable && ($table->settings['guided_template'] ?? null) === GuidedPricingTemplate::SILK_MATRIX->value) {
             $colors = $table->rules
                 ->flatMap(static fn (ServicePriceRule $rule): array => $rule->conditions ?? [])
-                ->filter(static fn (array $condition): bool => ($condition['parameter'] ?? null) === 'screen_colors' && ($condition['operator'] ?? null) === 'eq')
+                ->filter(static fn (array $condition): bool => $condition['parameter'] === 'screen_colors' && $condition['operator'] === 'eq')
                 ->map(static fn (array $condition): int => (int) ($condition['value'] ?? 0))
                 ->filter(static fn (int $color): bool => $color > 0)
                 ->unique()
@@ -354,7 +357,10 @@ final readonly class GuidedPricingDataService
         return [1, 2, 3, 4];
     }
 
-    /** @param list<int> $colors @return list<array<string, mixed>> */
+    /**
+     * @param  list<int>  $colors
+     * @return list<array<string, mixed>>
+     */
     private function silkRanges(?ServicePriceTable $table, array $colors): array
     {
         if (! $table instanceof ServicePriceTable || ($table->settings['guided_template'] ?? null) !== GuidedPricingTemplate::SILK_MATRIX->value) {
@@ -399,7 +405,10 @@ final readonly class GuidedPricingDataService
         return $ranges;
     }
 
-    /** @param list<int> $colors @return list<array<string, mixed>> */
+    /**
+     * @param  list<int>  $colors
+     * @return list<array<string, mixed>>
+     */
     private function defaultSilkRanges(array $colors): array
     {
         $definitions = [[10, 19], [20, 49], [50, 99], [100, null]];
@@ -422,7 +431,7 @@ final readonly class GuidedPricingDataService
     private function conditionColor(ServicePriceRule $rule): ?int
     {
         foreach ($rule->conditions ?? [] as $condition) {
-            if (($condition['parameter'] ?? null) === 'screen_colors' && ($condition['operator'] ?? null) === 'eq') {
+            if ($condition['parameter'] === 'screen_colors' && $condition['operator'] === 'eq') {
                 $color = (int) ($condition['value'] ?? 0);
 
                 return $color > 0 ? $color : null;
@@ -432,7 +441,11 @@ final readonly class GuidedPricingDataService
         return null;
     }
 
-    /** @param list<string> $options @param array<string, mixed> $settings @return list<array{option: string, amount: string}> */
+    /**
+     * @param  list<string>  $options
+     * @param  array<string, mixed>  $settings
+     * @return list<array{option: string, amount: string}>
+     */
     private function addonRows(array $options, array $settings, string $parameter): array
     {
         $allConfigured = $settings['per_item_addons'] ?? [];
@@ -441,17 +454,19 @@ final readonly class GuidedPricingDataService
                 ? $allConfigured[$parameter]
                 : [];
 
-        return array_values(array_map(function (string $option) use ($configured): array {
+        return array_map(function (string $option) use ($configured): array {
             $minor = (int) ($configured[$option] ?? 0);
 
             return [
                 'option' => $option,
                 'amount' => $minor > 0 ? $this->moneyParser->minorToMajor($minor) : '',
             ];
-        }, $options));
+        }, $options);
     }
 
-    /** @param mixed $rows @return array<string, int> */
+    /**
+     * @return array<string, int>
+     */
     private function addonMap(mixed $rows, string $field): array
     {
         if (! is_array($rows)) {
@@ -488,7 +503,10 @@ final readonly class GuidedPricingDataService
         return $map;
     }
 
-    /** @param list<array<string, mixed>> $ranges @param list<int> $colors */
+    /**
+     * @param  list<array<string, mixed>>  $ranges
+     * @param  list<int>  $colors
+     */
     private function validateRanges(array $ranges, array $colors): void
     {
         if ($ranges === []) {
@@ -523,8 +541,10 @@ final readonly class GuidedPricingDataService
                 throw ValidationException::withMessages(["ranges.{$index}.prices" => 'Preencha os preços desta faixa.']);
             }
 
+            $prices = $range['prices'];
+
             foreach ($colors as $color) {
-                $value = trim((string) (($range['prices'] ?? [])[(string) $color] ?? ($range['prices'] ?? [])[$color] ?? ''));
+                $value = trim((string) ($prices[(string) $color] ?? $prices[$color] ?? ''));
 
                 if ($value === '') {
                     throw ValidationException::withMessages([

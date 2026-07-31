@@ -51,20 +51,28 @@ final readonly class AdditionalGuidedPricingDataService
     {
         $settings = $this->compatibleSettings($table, GuidedPricingTemplate::SUBLIMATION_MATRIX);
         $categories = $this->sublimationCategories();
+        $categoryKeys = array_column($categories, 'key');
+        $selectedCategories = $this->configuredValues($settings, 'configured_categories', $categoryKeys);
+        $sampleCategory = (string) ($settings['sample_category'] ?? 'LOCAL_MEDIUM');
+
+        if (! in_array($sampleCategory, $selectedCategories, true)) {
+            $sampleCategory = $selectedCategories[0];
+        }
 
         return [
             'categories' => $categories,
+            'selected_categories' => $selectedCategories,
             'ranges' => $this->matrixRanges(
                 $table,
                 GuidedPricingTemplate::SUBLIMATION_MATRIX,
-                array_column($categories, 'key'),
+                $categoryKeys,
                 fn (ServicePriceRule $rule): ?string => $this->sublimationCategoryFromRule($rule),
                 [[1, 9], [10, 29], [30, null]],
             ),
             'valid_from' => $table?->valid_from?->format('Y-m-d') ?? '',
             'valid_until' => $table?->valid_until?->format('Y-m-d') ?? '',
             'sample_quantity' => 10,
-            'sample_category' => (string) ($settings['sample_category'] ?? 'LOCAL_MEDIUM'),
+            'sample_category' => $sampleCategory,
         ];
     }
 
@@ -89,8 +97,29 @@ final readonly class AdditionalGuidedPricingDataService
             $labelToKey[$column['label']] = $column['key'];
         }
 
+        $configuredLabels = $this->configuredValues($settings, 'configured_stitch_ranges', $stitchRanges);
+        $selectedColumnKeys = [];
+
+        foreach ($stitchColumns as $column) {
+            if (in_array($column['label'], $configuredLabels, true)) {
+                $selectedColumnKeys[] = $column['key'];
+            }
+        }
+
+        if ($selectedColumnKeys === []) {
+            $selectedColumnKeys[] = $stitchColumns[0]['key'];
+        }
+
+        $sampleStitchRange = $configuredLabels[0];
+        $digitizingAmount = max(0, (int) ($settings['digitizing_amount_minor'] ?? 0));
+        $digitizingChargeMode = (string) ($settings['digitizing_charge_mode'] ?? ($digitizingAmount > 0 ? 'SEPARATE' : 'INCLUDED'));
+
         return [
             'stitch_columns' => $stitchColumns,
+            'selected_stitch_columns' => $selectedColumnKeys,
+            'digitizing_charge_mode' => in_array($digitizingChargeMode, ['INCLUDED', 'SEPARATE'], true)
+                ? $digitizingChargeMode
+                : 'INCLUDED',
             'digitizing_price' => $this->moneyFromSetting($settings, 'digitizing_amount_minor'),
             'ranges' => $this->matrixRanges(
                 $table,
@@ -106,14 +135,26 @@ final readonly class AdditionalGuidedPricingDataService
             'valid_from' => $table?->valid_from?->format('Y-m-d') ?? '',
             'valid_until' => $table?->valid_until?->format('Y-m-d') ?? '',
             'sample_quantity' => 10,
-            'sample_stitch_range' => $stitchRanges[0],
+            'sample_stitch_range' => $sampleStitchRange,
         ];
     }
 
     /** @param array<string, mixed> $validated */
     public function sublimationSetup(array $validated): ServicePricingSetupData
     {
-        $categories = $this->sublimationCategories();
+        $allCategories = $this->sublimationCategories();
+        $selectedCategoryKeys = $this->stringList($validated['selected_categories'] ?? null);
+        $categories = array_values(array_filter(
+            $allCategories,
+            static fn (array $category): bool => in_array($category['key'], $selectedCategoryKeys, true),
+        ));
+
+        if ($categories === []) {
+            throw ValidationException::withMessages([
+                'selected_categories' => 'Escolha pelo menos um tipo de sublimação.',
+            ]);
+        }
+
         $categoryKeys = array_column($categories, 'key');
         $ranges = $this->validatedRanges($validated['ranges'] ?? null, $categoryKeys);
         $categoryMap = [];
@@ -154,13 +195,19 @@ final readonly class AdditionalGuidedPricingDataService
             }
         }
 
+        $sampleCategory = (string) ($validated['sample_category'] ?? '');
+
+        if (! in_array($sampleCategory, $categoryKeys, true)) {
+            $sampleCategory = $categoryKeys[0];
+        }
+
         return new ServicePricingSetupData(
             strategy: PricingStrategy::MATRIX,
             rules: $rules,
             settings: [
                 'guided_template' => GuidedPricingTemplate::SUBLIMATION_MATRIX->value,
                 'configured_categories' => $categoryKeys,
-                'sample_category' => (string) ($validated['sample_category'] ?? 'LOCAL_MEDIUM'),
+                'sample_category' => $sampleCategory,
             ],
             validFrom: $this->nullableString($validated['valid_from'] ?? null),
             validUntil: $this->nullableString($validated['valid_until'] ?? null),
@@ -187,8 +234,12 @@ final readonly class AdditionalGuidedPricingDataService
             throw ValidationException::withMessages(['stitch_columns' => 'Adicione pelo menos uma faixa de pontos.']);
         }
 
+        $digitizingChargeMode = (string) ($validated['digitizing_charge_mode'] ?? 'INCLUDED');
+
         try {
-            $digitizing = $this->moneyParser->majorToMinor((string) ($validated['digitizing_price'] ?? '0'));
+            $digitizing = $digitizingChargeMode === 'SEPARATE'
+                ? $this->moneyParser->majorToMinor((string) ($validated['digitizing_price'] ?? '0'))
+                : 0;
         } catch (InvalidArgumentException) {
             throw ValidationException::withMessages(['digitizing_price' => 'Revise o valor da criação da matriz.']);
         }
@@ -234,11 +285,55 @@ final readonly class AdditionalGuidedPricingDataService
             settings: [
                 'guided_template' => GuidedPricingTemplate::EMBROIDERY_MATRIX->value,
                 'configured_stitch_ranges' => array_column($stitchColumns, 'label'),
+                'digitizing_charge_mode' => $digitizingChargeMode,
                 'digitizing_amount_minor' => max(0, $digitizing),
             ],
             validFrom: $this->nullableString($validated['valid_from'] ?? null),
             validUntil: $this->nullableString($validated['valid_until'] ?? null),
         );
+    }
+
+    /**
+     * @param  array<string, mixed>  $settings
+     * @param  list<string>  $fallback
+     * @return non-empty-list<string>
+     */
+    private function configuredValues(array $settings, string $key, array $fallback): array
+    {
+        $configured = $this->stringList($settings[$key] ?? null);
+        $allowed = array_values(array_intersect($configured, $fallback));
+
+        if ($allowed !== []) {
+            /** @var non-empty-list<string> $allowed */
+            return $allowed;
+        }
+
+        if ($fallback === []) {
+            throw new InvalidArgumentException('A configuração guiada exige ao menos uma opção disponível.');
+        }
+
+        /** @var non-empty-list<string> $fallback */
+        return $fallback;
+    }
+
+    /** @return list<string> */
+    private function stringList(mixed $value): array
+    {
+        if (! is_array($value)) {
+            return [];
+        }
+
+        $items = [];
+
+        foreach ($value as $item) {
+            $text = trim((string) $item);
+
+            if ($text !== '' && ! in_array($text, $items, true)) {
+                $items[] = $text;
+            }
+        }
+
+        return $items;
     }
 
     /** @return list<string> */
@@ -255,7 +350,7 @@ final readonly class AdditionalGuidedPricingDataService
             ->first();
 
         return $parameter instanceof ServiceParameterDefinition && is_array($parameter->options)
-            ? array_values(array_map('strval', $parameter->options))
+            ? array_map('strval', $parameter->options)
             : [];
     }
 
@@ -314,7 +409,11 @@ final readonly class AdditionalGuidedPricingDataService
         return $ranges;
     }
 
-    /** @param list<string> $columns @param list<array{0: int, 1: ?int}> $definitions @return list<array<string, mixed>> */
+    /**
+     * @param  list<string>  $columns
+     * @param  list<array{0: int, 1: ?int}>  $definitions
+     * @return list<array<string, mixed>>
+     */
     private function emptyRanges(array $columns, array $definitions): array
     {
         return array_map(static function (array $definition) use ($columns): array {
@@ -332,9 +431,13 @@ final readonly class AdditionalGuidedPricingDataService
         }, $definitions);
     }
 
-    /** @param mixed $rawRanges @param list<string> $columns @return list<array<string, mixed>> */
+    /**
+     * @param  list<string>  $columns
+     * @return list<array<string, mixed>>
+     */
     private function validatedRanges(mixed $rawRanges, array $columns): array
     {
+        /** @var list<array<string, mixed>> $ranges */
         $ranges = is_array($rawRanges) ? array_values(array_filter($rawRanges, 'is_array')) : [];
 
         if ($ranges === []) {
@@ -415,7 +518,7 @@ final readonly class AdditionalGuidedPricingDataService
     private function conditionValue(ServicePriceRule $rule, string $parameter): ?string
     {
         foreach ($rule->conditions ?? [] as $condition) {
-            if (($condition['parameter'] ?? null) === $parameter && ($condition['operator'] ?? null) === 'eq') {
+            if ($condition['parameter'] === $parameter && $condition['operator'] === 'eq') {
                 $value = trim((string) ($condition['value'] ?? ''));
 
                 return $value !== '' ? $value : null;

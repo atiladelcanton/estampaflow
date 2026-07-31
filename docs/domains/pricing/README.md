@@ -82,3 +82,7 @@ A configuração guiada usa regras `MATRIX` para combinar faixa de quantidade co
 - versão anterior preservada.
 
 Os quatro serviços padrão — DTF, Silk, Sublimação e Bordado — possuem fluxo guiado. Serviços customizados continuam usando o editor genérico como fallback.
+
+### Seleções da configuração guiada
+
+Os assistentes de Sublimação e Bordado filtram a matriz comercial conforme as opções escolhidas na primeira etapa. Essas seleções são convertidas em regras declarativas e persistidas em `settings`, sem expor a estratégia interna ao usuário.
