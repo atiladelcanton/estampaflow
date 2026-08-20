@@ -62,6 +62,8 @@
         "types:check": "phpstan analyse --memory-limit=1G",
         "refactor:check": "rector process --dry-run",
         "test": [
+            "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
+            "@php artisan key:generate --force",
             "@php artisan config:clear --ansi",
             "@php artisan test"
         ],
